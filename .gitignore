@@ -1,0 +1,15 @@
+*kdev*
+*.swp
+*core*
+*.out
+*.txt
+*.exe
+*.gch
+*.o
+tags
+bak
+*.db
+*.txt
+*journal
+*html
+*log
