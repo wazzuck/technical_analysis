@@ -11,10 +11,10 @@ A multithreaded program to read several years of historic data and perform vario
 
 #### 3rd party libs used
 
-Backend
+C++ Backend
 - TALib for most of the calculations. https://ta-lib.org/
 - Sqlite for outputing the data that is then read in by the Frontend. https://www.sqlite.org/
 
-Frontend
+Python Frontend 
 * Bottle for generating the HTML. https://bottlepy.org/docs/dev/index.html
 * Leather for SVG graphs. https://leather.readthedocs.io/en/latest/about.html
