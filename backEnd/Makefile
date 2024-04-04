@@ -11,11 +11,11 @@ CPPFLAGS=-std=c++20 -ggdb3 -O0 -Wall -Wextra -pedantic
 ObjectCompilerCommand=$(CXX) $(CPPFLAGS) -o $@ $? -c
 ExecutableCompilerCommand=$(CXX) $(CPPFLAGS) -o $@ $? $(LDFLAGS) 
 
-all:Eod.exe TestInstrument.exe TestPriceLoader.exe TestCalendarDayInstrumentPrice.exe TestToolKit.exe TestEodDate.exe TestInstrumentPrices.exe TestSqlite.exe
-
 Eod.exe: EodDate.o RefDataInstrument.o RefDataLoader.o Fundamental.o FundamentalLoader.o ToolKit.o CalendarDayInstrumentPrice.o Technical.o InstrumentPrices.o PriceAnalysis.o PriceLoader.o TechnicalAnalysis.o Sqlite.o Eod.cpp
 	$(ExecutableCompilerCommand)
 	#-./$@
+
+all: Eod.exe TestInstrument.exe TestPriceLoader.exe TestCalendarDayInstrumentPrice.exe TestToolKit.exe TestEodDate.exe TestInstrumentPrices.exe TestSqlite.exe
 
 EodDate.o: EodDate.cpp
 	$(ObjectCompilerCommand)
