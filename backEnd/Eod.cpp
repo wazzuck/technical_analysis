@@ -39,9 +39,9 @@
 //
 // Usage //TODO move this documentation to a man page -?/--help method
 //
-// 	Eod.exe (Optional Start Date)
+//  Eod.exe (Optional Start Date)
 //
-//		Start Date allow for testing from a specific date
+//    Start Date allow for testing from a specific date
 //
 
 //C system headers
@@ -82,7 +82,7 @@
 using namespace std;
 using namespace eod;
 
-namespace fs = std::filesystem;
+namespace fs = filesystem;
 
 //##############################################################################
 // GLOBALS
@@ -195,8 +195,8 @@ int main ( int argc, char *argv[] )
   // The next section covers the creation of an instrument price object for each instrument in referenceDataMap
   //##############################################################################
 
-  map<string, InstrumentPrices*>* instrument_prices_map = nullptr;
-  instrument_prices_map = new map<string, InstrumentPrices*>();
+  map<string, InstrumentPrices *> *instrument_prices_map = nullptr;
+  instrument_prices_map = new map<string, InstrumentPrices *>();
 
   for ( auto element : reference_data_map ) {
     //             CalendarDayInstrumentPrice holds 1 EOD price for 1 day for 1 instrument
@@ -208,13 +208,13 @@ int main ( int argc, char *argv[] )
     //
     //             InstrumentPriceMap
     //
-    // 			* KEY mnemonic (VOD)
-    // 			-> VALUE InsrumentPrice Object
-    //             	- Reference Data
-    //             	- Fundamental Data
-    // 				- Price data stored in a map
-    //             		- All the prices for the instrument are held in a Calendar Day Instrument Price <map> called cdipMap
-    // 				- Technical analysis calulated data
+    //      * KEY mnemonic (VOD)
+    //      -> VALUE InsrumentPrice Object
+    //              - Reference Data
+    //              - Fundamental Data
+    //        - Price data stored in a map
+    //                - All the prices for the instrument are held in a Calendar Day Instrument Price <map> called cdipMap
+    //        - Technical analysis calulated data
     //
     //          NOTE The reference data can be out of date, the fundamental data is representative of the current list of actively traded instruments.
     //          At least for now both the reference data and the funademental data both need to be present. If the data is in the reference data,
@@ -256,7 +256,7 @@ int main ( int argc, char *argv[] )
   //  DEBUG : "/home/neville/data/20240208"
 
   stringstream ss;
-  for ( const auto & dataSubDirectory : fs::directory_iterator ( DATA_DIRECTORY_BASE_PATH ) ) {
+  for ( const auto &dataSubDirectory : fs::directory_iterator ( DATA_DIRECTORY_BASE_PATH ) ) {
     //DLOG(<< dataSubDirectory);
 
     ss.str ( "" );
@@ -306,7 +306,7 @@ int main ( int argc, char *argv[] )
       string file_to_load = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded + "/LSE_" + date_to_be_loaded;
 
       //START OF LAMBDA WRAPPER FUNCTION
-      auto lambdaWrapper = [=] ( string file_to_load, string date_to_be_loaded, map<string, InstrumentPrices*> ( *instrumentPricesMap ) ) {
+      auto lambdaWrapper = [=] ( string file_to_load, string date_to_be_loaded, map<string, InstrumentPrices *> ( *instrumentPricesMap ) ) {
         //DLOG("num_active_threads" << num_active_threads);
         unique_lock<mutex> lock ( mtx );
         cv.wait ( lock, [&]() {
@@ -318,8 +318,8 @@ int main ( int argc, char *argv[] )
           PriceLoader pl;
 
           //Create a calendar day instrument price map, indexed by the string date.
-          typedef map<string, CalendarDayInstrumentPrice*> cdipMapType;
-          cdipMapType* cdipMapPointer;
+          typedef map<string, CalendarDayInstrumentPrice *> cdipMapType;
+          cdipMapType *cdipMapPointer;
 
           //For each EOD data file run it through a single PriceLoader object which returns a CalendarDayInstrumentPrice map pointer
           cdipMapPointer = pl.getPrices ( file_to_load );
@@ -362,7 +362,7 @@ int main ( int argc, char *argv[] )
   }
 
   // Wait for all threads to finish
-  for ( auto& thread : threads ) {
+  for ( auto &thread : threads ) {
     thread.join();
   }
 
@@ -371,19 +371,19 @@ int main ( int argc, char *argv[] )
   //##############################################################################
   // Technical Analysis section
   //##############################################################################
-  map<string, InstrumentPrices*>::iterator instrument_price_iter = ( *instrument_prices_map ).begin();
+  map<string, InstrumentPrices *>::iterator instrument_price_iter = ( *instrument_prices_map ).begin();
 
   while ( instrument_price_iter != ( *instrument_prices_map ).end() ) {
-    map<string, CalendarDayInstrumentPrice*>* cdipMapPointer = instrument_price_iter->second->pa.getCdipMapPointer();
+    map<string, CalendarDayInstrumentPrice *> *cdip_map = instrument_price_iter->second->pa.getCdipMapPointer();
 
     DLOG ( "Running TechnicalAnalysis for " << instrument_price_iter->first );
-    DLOG ( "ipElement->second.pa.getCdipMapPointer() " << cdipMapPointer );
+    DLOG ( "instrument_price_iter->second.pa.getCdipMapPointer() " << cdip_map );
 
     TechnicalAnalysis *ta = new TechnicalAnalysis();
 
-    vector<double>* emaSlowPeriodVecPtr = new vector<double>;
-    vector<double>* emaFastPeriodVecPtr = new vector<double>;
-    vector<double>* macdVecPtr = new vector<double>;
+    vector<double> *ema_slow_period_vector = new vector<double>;
+    vector<double> *ema_fast_period_vector = new vector<double>;
+    vector<double> *macd_vector = new vector<double>;
 
     //TODO make fastPeriod private
     if ( MINIMUM_REQUIRED_DAYS < ta->fastPeriod ) {
@@ -391,21 +391,14 @@ int main ( int argc, char *argv[] )
       exit ( 1 );
     }
 
-    //TODO Should I set this in the funademental class?
-    //ipElement->second->pa.t->setMarketCap(ta->getMarketCap(ipElement->second->pa.getNextLastCalendarDayInstrumentClosePrice(0), ipElement->second->funda.getShares()));
-
-    //BUG e.g. where AAF has price from 20191210, but only the first entry in the cdipMAP is 2020031?
-    //cout << "Iterating over instrumentPriceMap " << ipElement.first << endl;
-    //cout << "cdipMap size is " << ipElement.second.cdipMap.size() << endl;
-
-    if ( ( int ) cdipMapPointer->size() < ta->fastPeriod ) {
+    if ( ( int ) cdip_map->size() < ta->fastPeriod ) {
       WLOG ( << instrument_price_iter->first << " has less than the minimum required sammple of prices, Deleting from map." );
       instrument_price_iter = instrument_prices_map->erase ( instrument_price_iter );
       continue;
     }
 
-    emaSlowPeriodVecPtr = ta->taCalculateEMA ( cdipMapPointer, ta->slowPeriod );
-    emaFastPeriodVecPtr = ta->taCalculateEMA ( cdipMapPointer, ta->fastPeriod );
+    ema_slow_period_vector = ta->taCalculateEMA ( cdip_map, ta->slowPeriod );
+    ema_fast_period_vector = ta->taCalculateEMA ( cdip_map, ta->fastPeriod );
 
     //There are problems with talib MACD
     //https://community.backtrader.com/topic/1934/standard-macd-vs-talib-macd-different-values
@@ -414,7 +407,7 @@ int main ( int argc, char *argv[] )
     //TODO WHY DOES THE SIGNAL PERIOD MATTER? THIS HACK SEEMS TO WORK?
     //HACK I have no idea why the first 7 are skipped?
 
-    macdVecPtr = ta->taCalculateMACD ( instrument_price_iter->second->pa.getCdipMapPointer() );
+    macd_vector = ta->taCalculateMACD ( instrument_price_iter->second->pa.getCdipMapPointer() );
     //ipElement->second->pa.t->setMACD(ta->taCalculateMACD(ipElement->second->pa.getCdipMapPointer()));
 
     //TODO macd has the smallest number of samples and by only storing those values we are wasting some of the additonally EMA calculations, maybe only calculate what is requried?
@@ -424,26 +417,22 @@ int main ( int argc, char *argv[] )
     // emaFastPeriodVecPtr 109
 
     int count = 0;
-    int macdVecSize = ( *macdVecPtr ).size();
-    for ( auto it = cdipMapPointer->begin(); it != cdipMapPointer->end(); ++it ) {
+    int macdVecSize = ( *macd_vector ).size();
+    for ( auto it = cdip_map->begin(); it != cdip_map->end(); ++it ) {
       if ( count == macdVecSize ) {
         break;
       }
 
-      DLOG ( "(*emaFastPeriodVecPtr)[count] " << ( *emaFastPeriodVecPtr ) [count] );
-      it->second->setEMAFast ( ( *emaFastPeriodVecPtr ) [count] );
-
-      DLOG ( "(*emaFastPeriodVecPtr)[count] " << ( *emaFastPeriodVecPtr ) [count] );
-      it->second->setEMASlow ( ( *emaSlowPeriodVecPtr ) [count] );
-
-      DLOG ( "(*macdVecPtr)[count] " << ( *macdVecPtr ) [count] );
-      it->second->setMACD ( ( *macdVecPtr ) [count] );
+      DLOG ( "(*ema_fast_period_vector)[count] " << ( *ema_fast_period_vector ) [count] );
+      it->second->setEMAFast ( ( *ema_fast_period_vector ) [count] );
+      DLOG ( "(*ema_slow_period_vector)[count] " << ( *ema_slow_period_vector ) [count] );
+      it->second->setEMASlow ( ( *ema_slow_period_vector ) [count] );
+      DLOG ( "(*macdVecPtr)[count] " << ( *macd_vector ) [count] );
+      it->second->setMACD ( ( *macd_vector ) [count] );
 
       count++;
     }
-
     LOG ( "Finished calculating technical data" );
-
     instrument_price_iter++;
   }
 
@@ -476,15 +465,14 @@ int main ( int argc, char *argv[] )
     //sqli.cdipMapSqlite = instrumentPriceMap[key]->pa.getCdipMapPointer();
     sqli.addPriceData ( ( *instrument_prices_map ) [key] );
 
-//Getting difference since previous day(s)
-    /*
-    *                ta.setPercentageChanges(value, 1);
-    *                ta.setPercentageChanges(value, 3);
-    *                ta.setPercentageChanges(value, 5);
-    *                ta.setMarketCap(value);
-    *
-    *                sqli.addTechnical();
-    */
+    //Getting difference since previous day(s)
+    //
+    //               ta.setPercentageChanges(value, 1);
+    //               ta.setPercentageChanges(value, 3);
+    //               ta.setPercentageChanges(value, 5);
+    //               ta.setMarketCap(value);
+    //
+    //               sqli.addTechnical();
 
     //Do market wide calculations for 3,5,30
     //Do performance verus the market to find market beaters
@@ -492,9 +480,8 @@ int main ( int argc, char *argv[] )
 
   sqli.closeDB();
 
-  /* BUG CURRENTLY TWO BUGS
-  * Instrument CBUY is loaded from reference data, but is not removed when it is not in price data
-  */
+  // BUG CURRENTLY TWO BUGS
+  // Instrument CBUY is loaded from reference data, but is not removed when it is not in price data
 
   const auto end = chrono::system_clock::now();
   const time_t end_time = chrono::system_clock::to_time_t ( end );

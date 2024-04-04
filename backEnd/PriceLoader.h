@@ -9,18 +9,18 @@ using namespace std;
 
 namespace eod
 {
-	class PriceLoader
-	{
-	//Class to store the data for each instrument, can this be a vector?
-	public:
-        PriceLoader();
-        map<string, CalendarDayInstrumentPrice*>* getPrices(const string fileName);
-        void printPrices(const string mnemonic);
+class PriceLoader
+{
+  //Class to store the data for each instrument, can this be a vector?
+public:
+  PriceLoader();
+  map<string, CalendarDayInstrumentPrice*>* getPrices ( const string fileName );
+  void printPrices ( const string mnemonic );
 
-		typedef map<string, CalendarDayInstrumentPrice*> cdipMapType;
-		cdipMapType* cdipMapPointer;
-        
-	private:
-		map<string, CalendarDayInstrumentPrice*> cdipMap;
-	};
+  typedef map<string, CalendarDayInstrumentPrice*> cdipMapType;
+  cdipMapType* cdipMapPointer;
+
+private:
+  map<string, CalendarDayInstrumentPrice*> cdipMap;
+};
 }

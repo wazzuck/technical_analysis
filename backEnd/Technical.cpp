@@ -32,48 +32,48 @@ using namespace std;
 
 namespace eod
 {
-	Technical::Technical()
-	    : mMarketCap(0.0)
-        /*
-        , mOneDayPercentageChange(0.0)
-        , mThreeDayPercentageChange(0.0)
-        , mFiveDayPercentageChange(0.0)
-        , mSMASlowPeriod(0.0)
-        , mSMAFastPeriod(0.0)
-        , mEMASlowPeriod(0.0)
-        , mEMAFastPeriod(0.0)
-        , mMACD(0.0)
-        , mStochastic(0.0)
-        , mPPO(0.0)
-        , mBSI("UNDEF")
-        */
-	{
-        emaFastPeriodVecPtr = new vector<double>();
-	}
+Technical::Technical()
+  : mMarketCap ( 0.0 )
+    /*
+    , mOneDayPercentageChange(0.0)
+    , mThreeDayPercentageChange(0.0)
+    , mFiveDayPercentageChange(0.0)
+    , mSMASlowPeriod(0.0)
+    , mSMAFastPeriod(0.0)
+    , mEMASlowPeriod(0.0)
+    , mEMAFastPeriod(0.0)
+    , mMACD(0.0)
+    , mStochastic(0.0)
+    , mPPO(0.0)
+    , mBSI("UNDEF")
+    */
+{
+  emaFastPeriodVecPtr = new vector<double>();
+}
 
-	Technical::~Technical()
-    {
-    }
+Technical::~Technical()
+{
+}
 
-    void Technical::setMarketCap(double inMarketCap)
-    {
-        mMarketCap = inMarketCap;
-    }
+void Technical::setMarketCap ( double inMarketCap )
+{
+  mMarketCap = inMarketCap;
+}
 
-    void Technical::setEMASlowPeriod(vector <double>* emaSlowPeriod)
-    {
-        emaSlowPeriodVecPtr = emaSlowPeriod;
-    }
+void Technical::setEMASlowPeriod ( vector <double> *emaSlowPeriod )
+{
+  emaSlowPeriodVecPtr = emaSlowPeriod;
+}
 
-    void Technical::setEMAFastPeriod(vector <double>* emaFastPeriod)
-    {
-        emaFastPeriodVecPtr = emaFastPeriod;
-    }
+void Technical::setEMAFastPeriod ( vector <double> *emaFastPeriod )
+{
+  emaFastPeriodVecPtr = emaFastPeriod;
+}
 
-    void Technical::setMACD(vector <double>* macd)
-    {
-        macdVecPtr = macd;
-    }
+void Technical::setMACD ( vector <double> *macd )
+{
+  macdVecPtr = macd;
+}
 
 /*
     void Technical::setStochastic(const double& stochastic)
@@ -82,56 +82,53 @@ namespace eod
     }
 */
 
-	void Technical::setValues(const vector<string> &v)
-    {
-		LOG("Test");
-/*
-        CalendarDayInstrumentPrice::setMnemonic(v[0]);
-        CalendarDayInstrumentPrice::setDate(v[1]);
-        CalendarDayInstrumentPrice::setOpen(v[2]);
-        CalendarDayInstrumentPrice::setHigh(v[3]);
-        CalendarDayInstrumentPrice::setLow(v[4]);
-        CalendarDayInstrumentPrice::setClose(v[5]);
-        CalendarDayInstrumentPrice::setVolume(v[6]);
-*/
-    }
+void Technical::setValues ( const vector<string> &v )
+{
+  LOG ( "Test" );
+  /*
+          CalendarDayInstrumentPrice::setMnemonic(v[0]);
+          CalendarDayInstrumentPrice::setDate(v[1]);
+          CalendarDayInstrumentPrice::setOpen(v[2]);
+          CalendarDayInstrumentPrice::setHigh(v[3]);
+          CalendarDayInstrumentPrice::setLow(v[4]);
+          CalendarDayInstrumentPrice::setClose(v[5]);
+          CalendarDayInstrumentPrice::setVolume(v[6]);
+  */
+}
 
-    void Technical::printTechnical(const string mnemonic)
-    {
-        DLOG("#########################################");
-        DLOG("Printing Technical data for " << mnemonic);
-        DLOG("#########################################");
+void Technical::printTechnical ( const string mnemonic )
+{
+  DLOG ( "#########################################" );
+  DLOG ( "Printing Technical data for " << mnemonic );
+  DLOG ( "#########################################" );
 
-        //DLOG("Printing address of emaSlowPeriodVecPtr " << emaSlowPeriodVecPtr);
+  //DLOG("Printing address of emaSlowPeriodVecPtr " << emaSlowPeriodVecPtr);
 
-        DLOG("Market Cap :: " << mMarketCap);
-        for (const auto element : *emaSlowPeriodVecPtr)
-        {
-            DLOG("Print emaSlowPeriod " << element);
-        }
+  DLOG ( "Market Cap :: " << mMarketCap );
+  for ( const auto element : *emaSlowPeriodVecPtr ) {
+    DLOG ( "Print emaSlowPeriod " << element );
+  }
 
-        for (const auto& element : *emaFastPeriodVecPtr)
-        {
-            DLOG("Printing emaFastPeriod " << element);
-        }
+  for ( const auto &element : *emaFastPeriodVecPtr ) {
+    DLOG ( "Printing emaFastPeriod " << element );
+  }
 
-        for (const auto& element : *macdVecPtr)
-        {
-            DLOG("Printing macd " << element);
-        }
+  for ( const auto &element : *macdVecPtr ) {
+    DLOG ( "Printing macd " << element );
+  }
 
-        /*
-        DLOG("One Day Percentage Change :: " << mOneDayPercentageChange);
-        DLOG("Three Day Percentage Change :: " << mThreeDayPercentageChange);
-        DLOG("Five Day Percentage Change :: " << mFiveDayPercentageChange);
-        DLOG("SMASlowPeriod :: " << mSMASlowPeriod);
-        DLOG("SMAFastPeriod :: " << mSMAFastPeriod);
-        DLOG("EMASlowPeriod :: " << mEMASlowPeriod);
-        DLOG("EMAFastPeriod :: " << mEMAFastPeriod);
-        DLOG("MACD :: " << mMACD);
-        DLOG("Stochastic :: " << mStochastic);
-        DLOG("PPO :: " << mPPO);
-        DLOG("BSI :: " << mBSI);
-        */
-    }
+  /*
+  DLOG("One Day Percentage Change :: " << mOneDayPercentageChange);
+  DLOG("Three Day Percentage Change :: " << mThreeDayPercentageChange);
+  DLOG("Five Day Percentage Change :: " << mFiveDayPercentageChange);
+  DLOG("SMASlowPeriod :: " << mSMASlowPeriod);
+  DLOG("SMAFastPeriod :: " << mSMAFastPeriod);
+  DLOG("EMASlowPeriod :: " << mEMASlowPeriod);
+  DLOG("EMAFastPeriod :: " << mEMAFastPeriod);
+  DLOG("MACD :: " << mMACD);
+  DLOG("Stochastic :: " << mStochastic);
+  DLOG("PPO :: " << mPPO);
+  DLOG("BSI :: " << mBSI);
+  */
+}
 }

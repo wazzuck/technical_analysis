@@ -10,33 +10,32 @@ using namespace eod;
 
 int main()
 {
-   LOG("Testing PriceLoader Class");
+  LOG ( "Testing PriceLoader Class" );
 
-    string fileToLoad = "/home/neville/data/20231101/LSE_20231101";
-    
-    PriceLoader pl;
+  string fileToLoad = "/home/neville/data/20231101/LSE_20231101";
 
-    typedef map<string, CalendarDayInstrumentPrice*> cdipMapType;
-    cdipMapType* cdipMapPointer;
+  PriceLoader pl;
 
-    cdipMapPointer = pl.getPrices(fileToLoad);
-    /*
-    for (auto const& pair : testMap) {
-        cout << pair.first << endl;
-        if (pair.first == "")
-        {
-            cout << "Found Blank" << endl;
-            exit(0);
-        }
-    }
-    */
-    //TODO BUG SLA is blank?
-    //testMap["AGK"].printCalendarDayInstrumentPrice();
+  typedef map<string, CalendarDayInstrumentPrice *> cdipMapType;
+  cdipMapType *cdipMapPointer;
 
-	for (auto const&[key, value] : *cdipMapPointer)
-	{
-		(*cdipMapPointer)[key]->printCalendarDayInstrumentPrice();
-	}
+  cdipMapPointer = pl.getPrices ( fileToLoad );
+  /*
+  for (auto const& pair : testMap) {
+      cout << pair.first << endl;
+      if (pair.first == "")
+      {
+          cout << "Found Blank" << endl;
+          exit(0);
+      }
+  }
+  */
+  //TODO BUG SLA is blank?
+  //testMap["AGK"].printCalendarDayInstrumentPrice();
 
-	return 0;
+  for ( auto const&[key, value] : *cdipMapPointer ) {
+    ( *cdipMapPointer ) [key]->printCalendarDayInstrumentPrice();
+  }
+
+  return 0;
 }

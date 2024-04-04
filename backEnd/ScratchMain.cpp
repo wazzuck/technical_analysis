@@ -12,19 +12,19 @@ using namespace EodToolKit;
 
 int main ()
 {
-    LOG("Hello");
+  LOG ( "Hello" );
 
-    string instrumentLine2 = "BT.A,20231123,123.15,125,121.6,122.65,2788357";
+  string instrumentLine2 = "BT.A,20231123,123.15,125,121.6,122.65,2788357";
 
-    Scratch s;
+  Scratch s;
 
-    CalendarDayInstrumentPrice cdip;
+  CalendarDayInstrumentPrice cdip;
 
-    ToolKit tk;
+  ToolKit tk;
 
-	cdip.setValues(tk.split(instrumentLine2, ','));
+  cdip.setValues ( tk.split ( instrumentLine2, ',' ) );
 
-    s.addCalendarDayInstrumentPrice("20231123", cdip);
+  s.addCalendarDayInstrumentPrice ( "20231123", cdip );
 
-    return 0;
+  return 0;
 }

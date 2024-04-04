@@ -11,21 +11,21 @@ using namespace EodToolKit;
 
 int main()
 {
-	LOG("Testing Fundamental Class");
+  LOG ( "Testing Fundamental Class" );
 
-	Fundamental fund;
+  Fundamental fund;
 
 //Note that the data is TAB delimited
-	//string instrument = "BP.A	BP Plc			0	0	0	0	0	0	0	0";
-	string instrument = "CARR	Carr's Group Plc			12.56	12.9	0	898210	0	0	36.23	171.13";
+  //string instrument = "BP.A BP Plc      0 0 0 0 0 0 0 0";
+  string instrument = "CARR	Carr's Group Plc			12.56	12.9	0	898210	0	0	36.23	171.13";
 
-	ToolKit tk;
+  ToolKit tk;
 
-	fund.setValues(tk.split(instrument, '\t'));
+  fund.setValues ( tk.split ( instrument, '\t' ) );
 
-	LOG( << fund.getMnemonic());
+  LOG ( << fund.getMnemonic() );
 
-	fund.printFundamental();
+  fund.printFundamental();
 
-	return 0;
+  return 0;
 }

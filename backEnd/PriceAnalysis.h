@@ -13,27 +13,27 @@ using namespace std;
 
 namespace eod
 {
-	//Forward declations of child classes
-	class Technical;
-	class CalendarDayInstrumentPrice;
+//Forward declations of child classes
+class Technical;
+class CalendarDayInstrumentPrice;
 
-	class PriceAnalysis //Working title
-	{
-		public:
-			PriceAnalysis();
-			~PriceAnalysis();
-			void addCalendarDayInstrumentPrice(const string& date, CalendarDayInstrumentPrice* cdipPtr);
-			CalendarDayInstrumentPrice* getCalendarDayInstrumentPrice(const string& date);
-			map<string, CalendarDayInstrumentPrice*>* getCdipMapPointer();
-			typedef map<string, CalendarDayInstrumentPrice*> cdipMapType;
-			//cdipMapType* cdipMapPointer;
+class PriceAnalysis //Working title
+{
+public:
+  PriceAnalysis();
+  ~PriceAnalysis();
+  void addCalendarDayInstrumentPrice ( const string& date, CalendarDayInstrumentPrice* cdipPtr );
+  CalendarDayInstrumentPrice* getCalendarDayInstrumentPrice ( const string& date );
+  map<string, CalendarDayInstrumentPrice*>* getCdipMapPointer();
+  typedef map<string, CalendarDayInstrumentPrice*> cdipMapType;
+  //cdipMapType* cdipMapPointer;
 
-			Technical* t;
-			void setMarketCap(double inMarketCap);
-            float getNextLastCalendarDayInstrumentClosePrice(int numberToGoBack);
-		private:
-			map<string, CalendarDayInstrumentPrice*> cdipMap;
-	};
+  Technical* t;
+  void setMarketCap ( double inMarketCap );
+  float getNextLastCalendarDayInstrumentClosePrice ( int numberToGoBack );
+private:
+  map<string, CalendarDayInstrumentPrice*> cdipMap;
+};
 }
 
 #endif

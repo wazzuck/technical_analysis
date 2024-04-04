@@ -6,10 +6,10 @@ using namespace spdlog;
 
 int main()
 {
-    //Use the default logger (stdout, multi-threaded, colored)
-    info("Hello, {}!", "Info");
-    
-    set_level(level::debug);
-    
-    debug("Hello, {}!", "Debug");
+  //Use the default logger (stdout, multi-threaded, colored)
+  info ( "Hello, {}!", "Info" );
+
+  set_level ( level::debug );
+
+  debug ( "Hello, {}!", "Debug" );
 }

@@ -31,7 +31,7 @@ using namespace EodToolKit;
 int main()
 {
 
-    DLOG("Running TestTechnical.exe");
+  DLOG ( "Running TestTechnical.exe" );
 
-    return 0;
+  return 0;
 }

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <iostream>
-#include <sqlite3.h> 
+#include <sqlite3.h>
 #include <string>
 
 #include "Sqlite.h"
@@ -13,66 +13,66 @@ using namespace std;
 using namespace eod;
 using namespace EodToolKit;
 
-int main() {
-    
-   	cout << "Testing Sqlite Class" << endl;
+int main()
+{
 
-    cout << "Hello" << endl;
-    
-    Sqlite sqli("/dev/shm/test.db");
-    
-	RefDataInstrument testRdi;
+  cout << "Testing Sqlite Class" << endl;
 
-	const string refArr[] = {"VOD","BT-AAFONE GROUP PLC","ORD USD0.20 20/21","GB00BH4HKS39","SHRS","Shares","Telecommunications","Telecommunications","24/02/2014","United Kingdom","GBX","MAIN MARKET","Premium Equity Commercial Companies","SET1","FE10"};
+  cout << "Hello" << endl;
 
-	vector<string> refVec (refArr, refArr + sizeof(refArr) / sizeof(refArr[0]) );
+  Sqlite sqli ( "/dev/shm/test.db" );
 
-	testRdi.setValues(refVec);
+  RefDataInstrument testRdi;
 
-    Fundamental fund;
-    
-	static const string arr[] = {"VOD","Vodafone Group Plc","Telecommunications Services","Mobile Telecommunications","0","-0.05","0","265276800","0","5.15","138.68","91.72"};
+  const string refArr[] = {"VOD","BT-AAFONE GROUP PLC","ORD USD0.20 20/21","GB00BH4HKS39","SHRS","Shares","Telecommunications","Telecommunications","24/02/2014","United Kingdom","GBX","MAIN MARKET","Premium Equity Commercial Companies","SET1","FE10"};
 
-	vector<string> fundVec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+  vector<string> refVec ( refArr, refArr + sizeof ( refArr ) / sizeof ( refArr[0] ) );
 
-	fund.setValues(fundVec);
-    
-    InstrumentPrices *ip = new InstrumentPrices();
+  testRdi.setValues ( refVec );
 
-    ip->rdi = testRdi;
-    ip->funda = fund;
+  Fundamental fund;
 
-    string instrument_20200212 = "VOD,20200212,150.74,155.52,150.16,152.64,46428587";
-    string instrument_20200213 = "VOD,20200213,151.18,153.3,150.5,151.76,38589780";
+  static const string arr[] = {"VOD","Vodafone Group Plc","Telecommunications Services","Mobile Telecommunications","0","-0.05","0","265276800","0","5.15","138.68","91.72"};
 
-    vector<string> instrumentVector={instrument_20200212, instrument_20200213};
+  vector<string> fundVec ( arr, arr + sizeof ( arr ) / sizeof ( arr[0] ) );
 
-    ToolKit tk;
+  fund.setValues ( fundVec );
 
-    for (vector<string>::iterator t=instrumentVector.begin(); t!=instrumentVector.end(); ++t) 
-    {
-        CalendarDayInstrumentPrice *cdip = new CalendarDayInstrumentPrice();
+  InstrumentPrices *ip = new InstrumentPrices();
 
-        cdip->setValues(tk.split(*t, ','));
+  ip->rdi = testRdi;
+  ip->funda = fund;
 
-        ip->pa.addCalendarDayInstrumentPrice(cdip->getDate(), cdip);
-        
-        //cdip.printCalendarDayInstrumentPrice();
-    }
-    /*
-    sqli.rdiSqlite = ip->rdi;
-    sqli.addReferenceData();
+  string instrument_20200212 = "VOD,20200212,150.74,155.52,150.16,152.64,46428587";
+  string instrument_20200213 = "VOD,20200213,151.18,153.3,150.5,151.76,38589780";
 
-    sqli.fundSqlite = ip.funda;
-    sqli.addFundamental();
-    */
+  vector<string> instrumentVector= {instrument_20200212, instrument_20200213};
 
-    //sqli.cdipMapSqlite = ip->pa.getCdipMapPointer();
-    sqli.addPriceData(ip);
-    
-    //sqli.addTechnical();
+  ToolKit tk;
 
-    sqli.closeDB();
+  for ( vector<string>::iterator t=instrumentVector.begin(); t!=instrumentVector.end(); ++t ) {
+    CalendarDayInstrumentPrice *cdip = new CalendarDayInstrumentPrice();
 
-    return 0;
+    cdip->setValues ( tk.split ( *t, ',' ) );
+
+    ip->pa.addCalendarDayInstrumentPrice ( cdip->getDate(), cdip );
+
+    //cdip.printCalendarDayInstrumentPrice();
+  }
+  /*
+  sqli.rdiSqlite = ip->rdi;
+  sqli.addReferenceData();
+
+  sqli.fundSqlite = ip.funda;
+  sqli.addFundamental();
+  */
+
+  //sqli.cdipMapSqlite = ip->pa.getCdipMapPointer();
+  sqli.addPriceData ( ip );
+
+  //sqli.addTechnical();
+
+  sqli.closeDB();
+
+  return 0;
 }
