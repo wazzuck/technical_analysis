@@ -9,7 +9,7 @@ A multithreaded program to read several years of historic data and perform vario
 - RSI
 - EMA
 
-#### 3rd party libs used
+#### Languages and 3rd party libraries used
 
 C++ Backend
 - TALib for most of the calculations. https://ta-lib.org/
