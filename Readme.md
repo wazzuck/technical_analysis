@@ -1,41 +1,20 @@
-# Technical-Analysis
+### Technical-Analysis
 
-A few tools to convert video and images into ASCII art in an ANSI terminal. These tools support color output using the ANSI 256 color set, as well as the creation of a self-contained playback executable for video converted to text, with compression able to fit 4 minutes of 80 column 15 FPS video onto a single floppy disk!
+A multithreaded program to read several years of historic data and perform various statistical analysis calculations outputting the data to a webpage which is used to sort, trend and graph the data to generate insights.
 
- ## Check out [this video](https://www.youtube.com/watch?v=uGoR3ZYZqjc) for more information and to see sample output for video to text conversion.
+#### Calculations currently implemented
 
-![Screenshot](screenshot.png)
+- Stochastics
+- MACD
+- RSI
+- EMA
 
-A sample image converted to text and printed to the terminal.
+#### 3rd party libs used
 
----
+Backend
+- TALib for most of the calculations. https://ta-lib.org/
+- Sqlite for outputing the data that is then read in by the Frontend. https://www.sqlite.org/
 
-**Note:** To run these programs, you will need Python 3 installed, alongside NumPy and OpenCV (for image io).
-
-## Displaying Images as Text
-The python script imageToTextColor.py will print an image file provided as an argument as text to the terminal.
-
-`python3 imgToTextColor.py your_image_here.jpg`
-
-The width of the output can be configured in the header of the python file.
-
-## Displaying Videos as Text
-The python script videoToTextColor.py will play back a video provided as an argument as text to the terminal.
-
-`python3 videoToTextColor.py your_video_here.mp4`
-
-The width and aspect ratio of the output can be configured in the header of the python file.
-
-
-## Creating Video Playback Executables
-The provided makefile allows building programs which will play the compressed text encoding of the video stored in the executable. The target video should be named `vid.mp4`, otherwise the path to the video can be changed in the header of convert.py.
-
-To build for Linux targets (using GCC) run 
-
-`make playback`
-
-Otherwise to build for Windows targets (using MinGW) run 
-
-`make playback.exe`
-
-Other aspects of the video encoding, such as character width and framerate can be adjusted in both convert.py and playback.c. **Be sure to update these parameters in both files.**
+Frontend
+* Bottle for generating the HTML. https://bottlepy.org/docs/dev/index.html
+* Leather for SVG graphs. https://leather.readthedocs.io/en/latest/about.html
