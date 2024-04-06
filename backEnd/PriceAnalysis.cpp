@@ -8,7 +8,6 @@ namespace eod
 PriceAnalysis::PriceAnalysis()
 {
   t = new Technical;
-  DLOG ( "PriceAnalysis address of t " << t );
   //cdipMapPointer = new cdipMapType(); // Allocate memory for the map pointer
   //cdipMap = *cdipMapPointer; // Assign the allocated memory to the member variable
   //DLOG("cdipMapPointer << " << cdipMapPointer);
@@ -36,7 +35,6 @@ PriceAnalysis::~PriceAnalysis()
 
 void PriceAnalysis::addCalendarDayInstrumentPrice ( const string &date, CalendarDayInstrumentPrice *cdipPtr )
 {
-  //DLOG("Running addCalendarDayInstrumentPrice");
   cdipMap[date] = cdipPtr; // Access map directly using the instance's map
 }
 
@@ -49,14 +47,17 @@ float PriceAnalysis::getNextLastCalendarDayInstrumentClosePrice ( int numberToGo
     if ( j == numberToGoBack ) {
       returnPrice = it->second->getClose();
     }
+
     j++;
   }
+
   return returnPrice;
 }
 
 CalendarDayInstrumentPrice *PriceAnalysis::getCalendarDayInstrumentPrice ( const string &date )
 {
   auto it = cdipMap.find ( date );
+
   if ( it != cdipMap.end() ) {
     return it->second;
   }

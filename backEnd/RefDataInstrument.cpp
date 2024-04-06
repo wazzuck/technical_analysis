@@ -34,18 +34,17 @@ RefDataInstrument::RefDataInstrument()
 void RefDataInstrument::setMnemonic ( const string &tidm )
 {
   RefDataInstrument::mMnemonic = tidm;
+  regex dot_in_middle ( "^..\\.." );
 
-  //if tidm ends with "." remove the "."
-  char lastChar = mMnemonic.back();
-  if ( strncmp ( &lastChar, ".", 1 ) == 0 ) {
-    //DLOG("has a " << lastChar);
+  char last_char = mMnemonic.back();
+  if ( strncmp ( &last_char, ".", 1 ) == 0 ) {
+    //Replace AO. with AO_ to match the other data sources
+    //DLOG( << tidm << "has a " << last_char );
     mMnemonic.pop_back();
   }
-
-  //Replace BP.A with BP_A
-  regex pattern ( "^..\.." );
-  if ( regex_match ( mMnemonic, pattern ) ) {
-    //TLOG("found regex");
+  else if ( regex_match ( mMnemonic, dot_in_middle ) ) {
+    //Replace BP.A with BP_A to match the other data sources
+    //TLOG( << tidm <<" found regex");
     mMnemonic.replace ( 2, 1, "_" );
   }
 }
@@ -174,7 +173,6 @@ string RefDataInstrument::getLseMarket()
 
 void RefDataInstrument::setFcaListingCategory ( const string &fcaListingCategory )
 {
-  //mFcaListingCategory = fcaListingCategory;
   mFcaListingCategory = tk.removeSpaces ( fcaListingCategory );
 }
 

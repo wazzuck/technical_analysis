@@ -8,6 +8,7 @@ int main()
 {
 
   TA_RetCode res = TA_Initialize();
+
   if ( res != TA_SUCCESS ) {
     fprintf ( stderr, "Error TA_Initialize: %d", res );
     return -1;
@@ -48,7 +49,8 @@ int main()
       printf ( "Result for day #%d outMACD: %f outMACDSignal: %f outMACDHist: %f\n",
                outBegIdx+i, * ( outMACD+i ), * ( outMACDSignal+i ), * ( outMACDHist+i ) );
     }
-  } else
+  }
+  else
     fprintf ( stderr, "Error TA_MACD: %d", res );
 
   delete[] outMACD;
@@ -72,12 +74,14 @@ int main()
     for ( int i = 0; i < outNbElementEMA; i++ ) {
       printf ( "Result for day #%d outEMA: %f\n", outBegIdxEMA+i, * ( outEMA+i ) );
     }
-  } else
+  }
+  else
     fprintf ( stderr, "Error TA_EMA: %d", res );
 
   delete[] outEMA;
 
   res = TA_Shutdown();
+
   if ( res != TA_SUCCESS ) {
     fprintf ( stderr, "Error TA_Shutdown: %d", res );
     return -1;

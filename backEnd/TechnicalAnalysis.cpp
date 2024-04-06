@@ -122,6 +122,8 @@ int TechnicalAnalysis::getSignalPeriod()
 //https://www.youtube.com/watch?v=ezcwBDsDviE
 vector <double> *TechnicalAnalysis::taCalculateEMA ( map <string, CalendarDayInstrumentPrice *> *cdipMapPtr, int numberOfDays )
 {
+  //DLOG ( "cdipMapPtr Size " << ( *cdipMapPtr ).size() );
+
   /*
   for (const auto& cdip : (*cdipMapPtr))
   {
@@ -141,6 +143,8 @@ vector <double> *TechnicalAnalysis::taCalculateEMA ( map <string, CalendarDayIns
   const int closePriceArray_size = sizeof ( closePriceArray ) / sizeof ( double );
 
   int res_size = closePriceArray_size - TA_EMA_Lookback ( numberOfDays );
+
+  //DLOG ( "res_size" << res_size );
 
   // dynamically allocate output arrays
   double *outEMA = new double[res_size]; // Pointer to an array
@@ -162,7 +166,8 @@ vector <double> *TechnicalAnalysis::taCalculateEMA ( map <string, CalendarDayIns
         printf("Result for day #%d outEMA: %f\n", outBegIdxEMA+i, *(outEMA+i));
     }
     */
-  } else {
+  }
+  else {
     fprintf ( stderr, "Error TA_EMA: %d", res );
     exit ( 1 );
   }
@@ -247,7 +252,8 @@ vector<double> *TechnicalAnalysis::taCalculateMACD ( map<string, CalendarDayInst
             outBegIdx+i, *(outMACD+i), *(outMACDSignal+i), *(outMACDHist+i));
     }
     */
-  } else {
+  }
+  else {
     fprintf ( stderr, "Error TA_MACD: %d", res );
   }
 
@@ -275,7 +281,6 @@ void TechnicalAnalysis::clearMACDVec()
     outMACDVec.clear();
 }
 */
-
 
 
 

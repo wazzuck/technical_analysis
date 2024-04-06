@@ -35,6 +35,7 @@ void Fundamental::setMnemonic ( const string &mnemonic )
   mMnemonic = mnemonic;
 
   regex pattern ( "^..\.." );
+
   if ( regex_match ( mnemonic, pattern ) ) {
     //TLOG("found regex");
     mMnemonic.replace ( 2, 1, "_" );

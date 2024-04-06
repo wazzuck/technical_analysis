@@ -42,6 +42,7 @@ void CalendarDayInstrumentPrice::setMnemonic ( const string &mnemonic )
   }
 
   regex pattern ( "^..\.." );
+
   if ( regex_match ( mMnemonic, pattern ) ) {
     //TLOG("found regex");
     mMnemonic.replace ( 2, 1, "_" );

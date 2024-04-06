@@ -34,7 +34,8 @@ map<string, CalendarDayInstrumentPrice *> *PriceLoader::getPrices ( const string
   else if ( fs::exists ( fileNameStem + ".csv" ) ) {
     fileName = fileNameStem + ".csv";
     isCsv = true;
-  } else {
+  }
+  else {
     LOG ( "Neither " + fileName + ".txt or " + fileName + ".csv" << "  exist" );
     exit ( 1 );
   }
@@ -53,6 +54,7 @@ map<string, CalendarDayInstrumentPrice *> *PriceLoader::getPrices ( const string
   }
 
   regex header ( "^Sym" );
+
   while ( getline ( inputStream, line ) ) {
     CalendarDayInstrumentPrice *cdipPtr = new CalendarDayInstrumentPrice();
 

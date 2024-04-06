@@ -77,7 +77,7 @@
 
 //Third party headers
 #include "Sqlite.h"
-#include "ta-lib/ta_libc.h" // Uses an open source Technical Analysis Lib see https://ta-lib.org/
+#include "ta-lib/ta_libc.h" // Uses a BSD licensed Technical Analysis library see https://ta-lib.org/
 
 using namespace std;
 using namespace eod;
@@ -99,7 +99,8 @@ int main ( int argc, char *argv[] )
 
   if ( cores == 0 || cores == 1 ) {
     WLOG ( "Defaulting to 1 worker thread." );
-  } else {
+  }
+  else {
     LOG ( "Number of available cores: " << cores );
     max_running_threads = cores - 1; // Save a single core for any other processes running.
   }
@@ -126,7 +127,8 @@ int main ( int argc, char *argv[] )
     initial_date_to_be_loaded = argv[1];
     LOG ( "Running custom start date " << argv[1] );
     NowDate.setDate ( initial_date_to_be_loaded );
-  } else {
+  }
+  else {
     initial_date_to_be_loaded = NowDate.getDate();
   }
 
@@ -135,11 +137,10 @@ int main ( int argc, char *argv[] )
   //##############################################################################
   // The next section of the program is concerned with loading in reference data.
   //##############################################################################
-
   // If a directory with today's date is not found the program will try to look further
   // back in the calendar. Useful if running tests on a day where there's no data
   // e.g. a weekend. The number of allowed days is stricter in the live environment
-  // vs a laptop which is used for testing
+  // vs a laptop which is used for testing.
 
   // Above the getenv method is used to get the $HOME environment variable.
   // For some reason this does not work for $HOSTNAME.
@@ -153,7 +154,8 @@ int main ( int argc, char *argv[] )
   if ( hostname_string == "penguin" ) {
     LOG ( "Running in development environment" );
     number_of_tries=100; //Set to an arbitrarily large number of retries.
-  } else {
+  }
+  else {
     LOG ( "Running in live environment" );
     number_of_tries = 2; //Set to 2 for issue recreation in the live environment on weekends.
   }
@@ -161,12 +163,14 @@ int main ( int argc, char *argv[] )
   bool initial_load_directory_exists = 0;
 
   string initial_load_directory = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded;
+
   for ( int i = 0; i < number_of_tries; i++ ) {
     if ( fs::exists ( initial_load_directory ) ) {
       starting_directory = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded;
       initial_load_directory_exists = 1;
       break;
-    } else {
+    }
+    else {
       WLOG ( "initial_load_directory  " << initial_load_directory << " does not exist, trying to load reference data from a previous date" );
       NowDate.setPreviousDate();
       date_to_be_loaded = NowDate.getDate();
@@ -180,8 +184,8 @@ int main ( int argc, char *argv[] )
   }
 
   RefDataLoader RefLoader;
-  map<string,RefDataInstrument> reference_data_map;
-  reference_data_map = RefLoader.getRefData ( initial_load_directory );
+  map< string, RefDataInstrument > *reference_data_map;
+  reference_data_map = RefLoader.loadRefData ( initial_load_directory );
 
   //##############################################################################
   // The next section of the program is concerned with loading in fundamental data.
@@ -198,7 +202,7 @@ int main ( int argc, char *argv[] )
   map<string, InstrumentPrices *> *instrument_prices_map = nullptr;
   instrument_prices_map = new map<string, InstrumentPrices *>();
 
-  for ( auto element : reference_data_map ) {
+  for ( auto element : *reference_data_map ) {
     //             CalendarDayInstrumentPrice holds 1 EOD price for 1 day for 1 instrument
     //             e.g. "VOD,20200212,150.74,155.52,150.16,152.64,46428587"
     //
@@ -226,17 +230,17 @@ int main ( int argc, char *argv[] )
     if ( fundamental_data_map.find ( mnemonic ) != fundamental_data_map.end() ) {
       //For each instrument found in the reference data file add a new InstrumentPrices object into a map (instrumentPriceMap) that is referenced by mnemonic.
 
-      DLOG ( "Creating InstrumentPrices for " << mnemonic );
       InstrumentPrices *ip = new InstrumentPrices;
 
       ip->funda = fundamental_data_map[mnemonic];
-      ip->rdi = reference_data_map[mnemonic];
+      ip->rdi = ( *reference_data_map ) [mnemonic];
 
       //As above the price data is loaded in the next section, but create the instrumentPriceMap entry to hold that data.
       ( *instrument_prices_map ) [mnemonic] = ip;
 
       //For now just add the reference data and fundamental data. The price data will be loaded later on.
-    } else {
+    }
+    else {
       //WLOG( << mnemonic << " is in the reference data but not the fundamental data. Not creating an instrumentPriceMap[" << mnemonic << "] entry");
       continue;
     }
@@ -246,8 +250,7 @@ int main ( int argc, char *argv[] )
   // The next section is concerned with loading in EOD price data.
   //##############################################################################
   LOG ( "Loading EOD Price Data" );
-
-  vector<string> dataSubDirectories;
+  vector<string> data_sub_directories;
 
   //The next section removes quotes "" from before and after the absolute directory path for each dataDirectorySubDirectory in DATA_DIRECTORY_BASE_PATH
   //  e.g. For each dataSubDirectory
@@ -256,14 +259,15 @@ int main ( int argc, char *argv[] )
   //  DEBUG : "/home/neville/data/20240208"
 
   stringstream ss;
-  for ( const auto &dataSubDirectory : fs::directory_iterator ( DATA_DIRECTORY_BASE_PATH ) ) {
+
+  for ( const auto &data_sub_directory : fs::directory_iterator ( DATA_DIRECTORY_BASE_PATH ) ) {
     //DLOG(<< dataSubDirectory);
 
     ss.str ( "" );
-    ss << dataSubDirectory;
+    ss << data_sub_directory;
     string directory = ss.str();
     directory.erase ( remove ( directory.begin(),directory.end(),'\"' ),directory.end() );
-    dataSubDirectories.insert ( dataSubDirectories.begin(), directory );
+    data_sub_directories.insert ( data_sub_directories.begin(), directory );
   }
 
   // * For each dated directory in the DATA_DIRECTORY_BASE_PATH load the price data from the LSE_<date>.txt/csv file into
@@ -299,10 +303,11 @@ int main ( int argc, char *argv[] )
   vector<thread> threads;
 
   int days_loaded_count = 0;
-  for ( auto j = 0; j < ( int ) dataSubDirectories.size(); j++ ) {
+
+  for ( auto j = 0; j < ( int ) data_sub_directories.size(); j++ ) {
     const string DIRECTORY_TO_LOAD_FROM = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded;
 
-    if ( find ( dataSubDirectories.begin(), dataSubDirectories.end(), DIRECTORY_TO_LOAD_FROM ) != dataSubDirectories.end() ) {
+    if ( find ( data_sub_directories.begin(), data_sub_directories.end(), DIRECTORY_TO_LOAD_FROM ) != data_sub_directories.end() ) {
       string file_to_load = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded + "/LSE_" + date_to_be_loaded;
 
       //START OF LAMBDA WRAPPER FUNCTION
@@ -334,15 +339,18 @@ int main ( int argc, char *argv[] )
             //if (cdipMap.contains(mnemonic))
             if ( ( *instrumentPricesMap ).contains ( mnemonic ) ) {
               ( *instrumentPricesMap ) [mnemonic]->addCdip ( date_to_be_loaded, ( *cdipMapPointer ) [mnemonic] );
-            } else {
+            }
+            else {
               //Most likely a corporate action leading to a delisting
               //LOG(<< mnemonic << " is in the reference and fundamental data but not in price data for " << date_to_be_loaded);
 
               //TODO enable this line to delete unneeded instrument
               //Need to test this before using properly as deleting objects in memory can cause unexpeced results.
-              //delete instrumentPriceMap[mnemonic];
+              //Requires an iterator
+              //delete ( *instrumentPricesMap )[mnemonic];
             }
           }
+
           num_active_threads--;
           cv.notify_one();
         };
@@ -358,6 +366,7 @@ int main ( int argc, char *argv[] )
         break;
       }
     }
+
     date_to_be_loaded = NowDate.getNextDate();
   }
 
@@ -376,8 +385,8 @@ int main ( int argc, char *argv[] )
   while ( instrument_price_iter != ( *instrument_prices_map ).end() ) {
     map<string, CalendarDayInstrumentPrice *> *cdip_map = instrument_price_iter->second->pa.getCdipMapPointer();
 
-    DLOG ( "Running TechnicalAnalysis for " << instrument_price_iter->first );
-    DLOG ( "instrument_price_iter->second.pa.getCdipMapPointer() " << cdip_map );
+    //DLOG ( "Running TechnicalAnalysis for " << instrument_price_iter->first );
+    //DLOG ( "instrument_price_iter->second.pa.getCdipMapPointer() " << cdip_map );
 
     TechnicalAnalysis *ta = new TechnicalAnalysis();
 
@@ -385,16 +394,10 @@ int main ( int argc, char *argv[] )
     vector<double> *ema_fast_period_vector = new vector<double>;
     vector<double> *macd_vector = new vector<double>;
 
-    //TODO make fastPeriod private
-    if ( MINIMUM_REQUIRED_DAYS < ta->fastPeriod ) {
-      ELOG ( "NOT ENOUGH DAYS OF EOD DATA LOADED" );
-      exit ( 1 );
-    }
-
-    if ( ( int ) cdip_map->size() < ta->fastPeriod ) {
-      WLOG ( << instrument_price_iter->first << " has less than the minimum required sammple of prices, Deleting from map." );
-      instrument_price_iter = instrument_prices_map->erase ( instrument_price_iter );
-      continue;
+    if ( instrument_price_iter->first == "BU_P" ) {
+      instrument_price_iter->second->PrintInstrumentPrices();
+      LOG ( "HMMM This instrument shouldn't be here" );
+      exit ( 0 );
     }
 
     ema_slow_period_vector = ta->taCalculateEMA ( cdip_map, ta->slowPeriod );
@@ -410,7 +413,7 @@ int main ( int argc, char *argv[] )
     macd_vector = ta->taCalculateMACD ( instrument_price_iter->second->pa.getCdipMapPointer() );
     //ipElement->second->pa.t->setMACD(ta->taCalculateMACD(ipElement->second->pa.getCdipMapPointer()));
 
-    //TODO macd has the smallest number of samples and by only storing those values we are wasting some of the additonally EMA calculations, maybe only calculate what is requried?
+    //TODO MACD has the smallest number of samples and by only storing those values we are wasting some of the additonally EMA calculations, maybe only calculate what is requried?
     //i.e.
     // macdPtr 87    <-- Stop loading the data when we reach 87, thow other ema values away.
     // emaSlowPeriodVecPtr 95
@@ -418,23 +421,25 @@ int main ( int argc, char *argv[] )
 
     int count = 0;
     int macdVecSize = ( *macd_vector ).size();
+
     for ( auto it = cdip_map->begin(); it != cdip_map->end(); ++it ) {
       if ( count == macdVecSize ) {
         break;
       }
 
-      DLOG ( "(*ema_fast_period_vector)[count] " << ( *ema_fast_period_vector ) [count] );
+      //DLOG ( "(*ema_fast_period_vector)[count] " << ( *ema_fast_period_vector ) [count] );
       it->second->setEMAFast ( ( *ema_fast_period_vector ) [count] );
-      DLOG ( "(*ema_slow_period_vector)[count] " << ( *ema_slow_period_vector ) [count] );
+      //DLOG ( "(*ema_slow_period_vector)[count] " << ( *ema_slow_period_vector ) [count] );
       it->second->setEMASlow ( ( *ema_slow_period_vector ) [count] );
-      DLOG ( "(*macdVecPtr)[count] " << ( *macd_vector ) [count] );
+      //DLOG ( "(*macdVecPtr)[count] " << ( *macd_vector ) [count] );
       it->second->setMACD ( ( *macd_vector ) [count] );
 
       count++;
     }
-    LOG ( "Finished calculating technical data" );
     instrument_price_iter++;
   }
+
+  LOG ( "Finished calculating technical data" );
 
   //##############################################################################
   // Sqlite
@@ -467,13 +472,12 @@ int main ( int argc, char *argv[] )
 
     //Getting difference since previous day(s)
     //
-    //               ta.setPercentageChanges(value, 1);
-    //               ta.setPercentageChanges(value, 3);
-    //               ta.setPercentageChanges(value, 5);
-    //               ta.setMarketCap(value);
+    // ta.setPercentageChanges(value, 1);
+    // ta.setPercentageChanges(value, 3);
+    // ta.setPercentageChanges(value, 5);
+    // ta.setMarketCap(value);
     //
-    //               sqli.addTechnical();
-
+    // sqli.addTechnical();
     //Do market wide calculations for 3,5,30
     //Do performance verus the market to find market beaters
   }

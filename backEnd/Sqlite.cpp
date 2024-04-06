@@ -36,7 +36,8 @@ Sqlite::Sqlite ( string absoluteDatabaseFileName )
   if ( returnCode ) {
     ELOG ( "Error: " << sqlite3_errmsg ( db ) );
     exit ( 1 );
-  } else {
+  }
+  else {
     LOG ( "Opened database successfully" );
   }
 
@@ -263,7 +264,8 @@ void Sqlite::runSql ( const string &inSql )
     ELOG ( << inSql );
     ELOG ( ":Error running sql " << sqlite3_errmsg ( db ) );
     exit ( 1 );
-  } else {
+  }
+  else {
     LOG ( "sql ran successfully" );
     LOG ( << inSql );
   }

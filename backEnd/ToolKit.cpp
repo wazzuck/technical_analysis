@@ -18,6 +18,7 @@ void ToolKit::split ( const string &s, char delim, vector<string> &elems )
   stringstream ss;
   ss.str ( s );
   string item;
+
   while ( getline ( ss, item, delim ) ) {
     elems.push_back ( item );
   }
@@ -48,6 +49,7 @@ string ToolKit::removeSpaces ( const string inString )
 
     temp = "";
   }
+
   return str;
 }
 
@@ -61,12 +63,14 @@ string ToolKit::removeChar ( const string inWord, const char ch )
       i--;
     }
   }
+
   return word;
 }
 
 string ToolKit::removePunctuation ( const string inWord )
 {
   string str = inWord;
+
   for ( int i = 0, len = str.size(); i < len; i++ ) {
     // check whether parsing character is punctuation or not
     if ( ispunct ( str[i] ) ) {
@@ -74,6 +78,7 @@ string ToolKit::removePunctuation ( const string inWord )
       len = str.size();
     }
   }
+
   return str;
 }
 
@@ -97,6 +102,7 @@ string ToolKit::replaceChar ( const string inString, const char searchChar, cons
       outString[i] = searchChar;
     */
   }
+
   return outString;
 }
 
@@ -131,15 +137,18 @@ vector<string> ToolKit::split ( const string &s, char delim )
         if ( regex_search ( entry, m, endreg ) ) {
           //DLOG("Also found the end!");
           continue;
-        } else {
+        }
+        else {
           //DLOG"Element at the START of a merge " << entry);
           stringToMerge += entry + ",";
           insideQuotes = 1;
         }
+
         startingPlace = iteratorCount;
         //DLOG"Starting place " << startingPlace);
       }
-    } else if ( insideQuotes == 1 ) {
+    }
+    else if ( insideQuotes == 1 ) {
       // flag type for determining the matching behavior (in this case on string objects)
       smatch m;
 
@@ -175,12 +184,14 @@ vector<string> ToolKit::split ( const string &s, char delim )
         endingPlace = 0;
 
         insideQuotes = 0;
-      } else {
+      }
+      else {
         //DLOG("Element in MIDDLE of a merge " << entry);
         stringToMerge += entry + ",";
       }
     }
   }
+
   /*
   if (startingPlace != 0)
   {

@@ -1,35 +1,0 @@
-Script started on 2024-04-02 23:16:39+01:00 [TERM="tmux-256color" TTY="/dev/pts/2" COLUMNS="211" LINES="45"]
-[?2004h[neville@penguin backEnd]$ l^C[?2004l[?2004h[?2004l
-[?2004h[neville@penguin backEnd]$ scripts 
-[?2004l[?2004h[neville@penguin scripts]$ pw
-[?2004lbash: pw: command not found
-[?2004h[neville@penguin scripts]$ pwd
-[?2004l/home/neville/technical_analysis/scripts
-[?2004h[neville@penguin scripts]$ ll
-[?2004ltotal 56K
--rwx------ 1 neville neville  931 Apr  2 20:16 [0m[01;32mcopyInData.sh[0m
--rwx------ 1 neville neville  908 Apr  2 20:16 [01;32mbottlelogin.py[0m
--rwx------ 1 neville neville  163 Apr  2 20:16 [01;32marchiceData.sh[0m
--rwx------ 1 neville neville  229 Apr  2 20:16 [01;32mgetAndRun.sh[0m
--rwx------ 1 neville neville  179 Apr  2 20:16 [01;32mdeploy.sh[0m
--rwx------ 1 neville neville   45 Apr  2 20:16 [01;32mpipInstallAPIs.sh[0m
--rwx------ 1 neville neville  400 Apr  2 20:16 [01;32mtestLeatherAPI.py[0m
--rwx------ 1 neville neville  513 Apr  2 20:16 [01;32mtestBottleAPI.py[0m
--rwx------ 1 neville neville  132 Apr  2 20:16 [01;32mpullData.sh[0m
--rwx------ 1 neville neville  252 Apr  2 20:16 [01;32mxls2csv.py[0m
--rwx------ 1 neville neville  347 Apr  2 20:16 [01;32mtestSvg.py[0m
--rwx------ 1 neville neville  423 Apr  2 20:19 [01;32mnightlyBuilds.sh[0m
--rwx------ 1 neville neville  516 Apr  2 20:20 [01;32mcheckData.sh[0m
--rwx------ 1 neville neville 3.6K Apr  2 22:23 [01;32mgetEOD.py[0m
-drwxr-xr-x 1 neville neville  360 Apr  2 22:24 [01;34m.[0m
-drwxr-xr-x 1 neville neville  118 Apr  2 22:30 [01;34m..[0m
-[?2004h[neville@penguin scripts]$ ^C[?2004l[?2004h[?2004l
-[?2004h[neville@penguin scripts]$ get
-getconf     getent      getopt      getopts     gettext     gettextize  gettext.sh  
-[neville@penguin scripts]$ get
-getconf     getent      getopt      getopts     gettext     gettextize  gettext.sh  
-[neville@penguin scripts]$ getE^C[?2004l[?2004h[?2004l
-[?2004h[neville@penguin scripts]$ [K[neville@penguin scripts]$ [K[neville@penguin scripts]$ exit
-[?2004lexit
-
-Script done on 2024-04-02 23:19:04+01:00 [COMMAND_EXIT_CODE="130"]

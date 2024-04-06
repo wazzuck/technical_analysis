@@ -105,6 +105,7 @@ void Technical::printTechnical ( const string mnemonic )
   //DLOG("Printing address of emaSlowPeriodVecPtr " << emaSlowPeriodVecPtr);
 
   DLOG ( "Market Cap :: " << mMarketCap );
+
   for ( const auto element : *emaSlowPeriodVecPtr ) {
     DLOG ( "Print emaSlowPeriod " << element );
   }

@@ -43,7 +43,8 @@ int main ( int argc, char *argv[] )
     initial_date_to_be_loaded = argv[1];
     LOG ( "Running custom start date " << argv[1] );
     nowDate.setDate ( initial_date_to_be_loaded );
-  } else {
+  }
+  else {
     initial_date_to_be_loaded = nowDate.getDate();
   }
 
@@ -56,12 +57,14 @@ int main ( int argc, char *argv[] )
   bool initial_load_directory_exists = 0;
 
   string initial_load_directory = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded;
+
   for ( int i = 0; i < number_of_tries; i++ ) {
     if ( fs::exists ( initial_load_directory ) ) {
       starting_directory = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded;
       initial_load_directory_exists = 1;
       break;
-    } else {
+    }
+    else {
       WLOG ( "initial_load_directory  " << initial_load_directory << " does not exist, trying to load reference data from a previous date" );
       nowDate.setPreviousDate();
       date_to_be_loaded = nowDate.getDate();
@@ -93,6 +96,7 @@ int main ( int argc, char *argv[] )
 
   //The next section removes quotes "" from before and after the absolute directory path for each dataDirectorySubDirectory in DATA_DIRECTORY_BASE_PATH
   stringstream ss;
+
   for ( const auto &dataDirectorySubDirectory : fs::directory_iterator ( DATA_DIRECTORY_BASE_PATH ) ) {
     //DLOG(dataDirectorySubDirectory);
 
@@ -113,6 +117,7 @@ int main ( int argc, char *argv[] )
   const int MAX_DAYS_LOADED = ta.fastPeriod + 90;
 
   int days_loaded_count = 0;
+
   for ( auto j = 0; j < ( int ) dataDirectorySubDirectoryVector.size(); j++ ) {
     const string DIRECTORY_TO_LOAD_FROM = DATA_DIRECTORY_BASE_PATH + date_to_be_loaded;
 
@@ -128,6 +133,7 @@ int main ( int argc, char *argv[] )
 
       for ( auto const&[key, val] : *cdipMapPointer ) {
         mnemonic = key;
+
         //DLOG( << mnemonic);
         if ( mnemonic == ip.rdi.getMnemonic() ) {
           ip.addCdip ( date_to_be_loaded, ( *cdipMapPointer ) [mnemonic] );
@@ -143,6 +149,7 @@ int main ( int argc, char *argv[] )
         break;
       }
     }
+
     date_to_be_loaded = nowDate.getNextDate();
   }
 

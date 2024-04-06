@@ -35,13 +35,11 @@ InstrumentPrices::~InstrumentPrices()
 
 void InstrumentPrices::addCdip ( string inDate, CalendarDayInstrumentPrice *cdipPtr )
 {
-  //DLOG("InstruentPrices incoming cdipPtr " << cdipPtr);
   pa.addCalendarDayInstrumentPrice ( inDate, cdipPtr );
 }
 
 CalendarDayInstrumentPrice *InstrumentPrices::getCdip ( string inDate )
 {
-  //DLOG("InstruentPrices outgoing pointer " << pa.getCalendarDayInstrumentPrice(inDate));
   return pa.getCalendarDayInstrumentPrice ( inDate );
 }
 
@@ -55,7 +53,6 @@ void InstrumentPrices::setMarketCap ( double inMarketCap )
   pa.setMarketCap ( inMarketCap );
 }
 
-
 void InstrumentPrices::PrintInstrumentPrices()
 {
   string mnemonic = rdi.getMnemonic();
@@ -64,22 +61,19 @@ void InstrumentPrices::PrintInstrumentPrices()
   rdi.printRefDataInstrument();
   funda.printFundamental();
 
-  // Assuming pa is initialized correctly
   map<string, CalendarDayInstrumentPrice *> *cdipMapPtr = pa.getCdipMapPointer();
 
   DLOG ( "cdipMap.size() " << ( *cdipMapPtr ).size() );
 
   for ( const auto &pair : ( *cdipMapPtr ) ) {
     CalendarDayInstrumentPrice *cdipPtr = pair.second;
-    DLOG ( "InstrumentPrices PrintInstrumentPrices cdipPtr " << cdipPtr );
+
     if ( cdipPtr != nullptr ) {
       cdipPtr->printCalendarDayInstrumentPrice(); // Assuming the function name is printCalendarDayInstrumentPrice
-    } else {
+    }
+    else {
       cout << "No CalendarDayInstrumentPrice object found for this date." << endl;
     }
   }
-
-  //This may no longer be requried
-  //pa.t->printTechnical(mnemonic);
 }
 }

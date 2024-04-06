@@ -23,7 +23,8 @@ map<string,Fundamental> FundamentalLoader::loadFundamental ( map<string,Fundamen
 
   if ( fs::exists ( fundamentalAbsoluteFileName ) ) {
     LOG ( "fundamentalAbsoluteFileName directory " << fundamentalAbsoluteFileName << " exists" );
-  } else {
+  }
+  else {
     ELOG ( << fundamentalAbsoluteFileName << " doesn't exist" );
     exit ( 1 );
   }
@@ -45,7 +46,8 @@ map<string,Fundamental> FundamentalLoader::loadFundamental ( map<string,Fundamen
     if ( line == "" ) {
       LOG ( "Reached end of file" );
       break;
-    } else {
+    }
+    else {
       //ignore header
       if ( count > 0 ) {
         line.pop_back(); //Remove end of line char
@@ -61,6 +63,7 @@ map<string,Fundamental> FundamentalLoader::loadFundamental ( map<string,Fundamen
         //fundamentalMap[mnemonic].printFundamental();
       }
     }
+
     count++;
   }
 
