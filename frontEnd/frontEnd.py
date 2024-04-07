@@ -7,11 +7,7 @@ from datetime import date, datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-port = 587  # For SSL
-smtp_server = "smtp.gmail.com"
-sender_email="nevillebryce@gmail.com"
-receiver_email="nevillebryce@gmail.com"
-password = "pnaqqaixvzmelnzj"
+
 
 """
 
