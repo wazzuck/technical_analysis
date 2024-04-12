@@ -21,13 +21,10 @@ class Sqlite: public RefDataInstrument
 public:
   Sqlite ( string absoluteDatabaseFileName );
   void closeDB();
-  //void createPriceTable();
-  void addTechnical();
+  void addTechnical( InstrumentPrices );
   void addReferenceData ( InstrumentPrices* );
   void addFundamental ( InstrumentPrices* );
   void addPriceData ( InstrumentPrices* );
-
-  //map <string, CalendarDayInstrumentPrice*>* cdipMapSqlite;
 
 private:
   void runSql ( const string& inSql );

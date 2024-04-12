@@ -2,14 +2,13 @@
 DELETE_ON_ERROR:=
 
 CXX=g++
-CXX=clang++
 #CXX=clang++
 RM=rm -f
 LDFLAGS=-lsqlite3 -DSQLITE_THREADSAFE=1 -lta_lib
 #CPPFLAGS=-std=c++20 -ggdb3 -O0 -Wall -Wextra -pedantic -fsanitize=address -static-libasan -fno-omit-frame-pointer -fsanitize-address-use-after-scope
 CPPFLAGS=-std=c++20 -ggdb3 -O0 -Wall -Wextra -pedantic
 ObjectCompilerCommand=$(CXX) $(CPPFLAGS) -o $@ $? -c
-ExecutableCompilerCommand=$(CXX) $(CPPFLAGS) -o $@ $? $(LDFLAGS) 
+ExecutableCompilerCommand=$(CXX) $(CPPFLAGS) -o $@ $? $(LDFLAGS)
 
 Eod.exe: EodDate.o RefDataInstrument.o RefDataLoader.o Fundamental.o FundamentalLoader.o ToolKit.o CalendarDayInstrumentPrice.o Technical.o InstrumentPrices.o PriceAnalysis.o PriceLoader.o TechnicalAnalysis.o Sqlite.o Eod.cpp
 	$(ExecutableCompilerCommand)
@@ -34,7 +33,7 @@ TestToolKit.exe: ToolKit.o TestToolKit.cpp
 RefDataInstrument.o: RefDataInstrument.cpp
 	$(ObjectCompilerCommand)
 
-TestRefDataInstrument.exe: RefDataInstrument.o ToolKit.o TestRefDataInstrument.cpp
+TestRefDataInstrument.exe: ToolKit.o RefDataInstrument.o TestRefDataInstrument.cpp
 	$(ExecutableCompilerCommand)
 	-./$@
 

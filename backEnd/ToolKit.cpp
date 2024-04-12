@@ -57,7 +57,7 @@ string ToolKit::removeChar ( const string inWord, const char ch )
 {
   string word = inWord;
 
-  for ( int i = 0; i < word.length(); i++ ) {
+  for ( unsigned int i = 0; i < word.length(); i++ ) {
     if ( word[i] == ch ) {
       word.erase ( word.begin()+i );
       i--;

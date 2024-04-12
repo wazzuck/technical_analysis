@@ -75,26 +75,22 @@ void Technical::setMACD ( vector <double> *macd )
   macdVecPtr = macd;
 }
 
-/*
-    void Technical::setStochastic(const double& stochastic)
-    {
-        mStochastic = stochastic;
-    }
-*/
+    // void Technical::setStochastic(const double& stochastic)
+    // {
+    //     mStochastic = stochastic;
+    // }
 
-void Technical::setValues ( const vector<string> &v )
-{
-  LOG ( "Test" );
-  /*
-          CalendarDayInstrumentPrice::setMnemonic(v[0]);
-          CalendarDayInstrumentPrice::setDate(v[1]);
-          CalendarDayInstrumentPrice::setOpen(v[2]);
-          CalendarDayInstrumentPrice::setHigh(v[3]);
-          CalendarDayInstrumentPrice::setLow(v[4]);
-          CalendarDayInstrumentPrice::setClose(v[5]);
-          CalendarDayInstrumentPrice::setVolume(v[6]);
-  */
-}
+// void Technical::setValues ( const vector<string> &v )
+// {
+//   LOG ( "Test" );
+//           CalendarDayInstrumentPrice::setMnemonic(v[0]);
+//           CalendarDayInstrumentPrice::setDate(v[1]);
+//           CalendarDayInstrumentPrice::setOpen(v[2]);
+//           CalendarDayInstrumentPrice::setHigh(v[3]);
+//           CalendarDayInstrumentPrice::setLow(v[4]);
+//           CalendarDayInstrumentPrice::setClose(v[5]);
+//           CalendarDayInstrumentPrice::setVolume(v[6]);
+// }
 
 void Technical::printTechnical ( const string mnemonic )
 {

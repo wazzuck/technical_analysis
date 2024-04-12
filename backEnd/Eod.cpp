@@ -385,20 +385,11 @@ int main ( int argc, char *argv[] )
   while ( instrument_price_iter != ( *instrument_prices_map ).end() ) {
     map<string, CalendarDayInstrumentPrice *> *cdip_map = instrument_price_iter->second->pa.getCdipMapPointer();
 
-    //DLOG ( "Running TechnicalAnalysis for " << instrument_price_iter->first );
-    //DLOG ( "instrument_price_iter->second.pa.getCdipMapPointer() " << cdip_map );
-
     TechnicalAnalysis *ta = new TechnicalAnalysis();
 
     vector<double> *ema_slow_period_vector = new vector<double>;
     vector<double> *ema_fast_period_vector = new vector<double>;
     vector<double> *macd_vector = new vector<double>;
-
-    if ( instrument_price_iter->first == "BU_P" ) {
-      instrument_price_iter->second->PrintInstrumentPrices();
-      LOG ( "HMMM This instrument shouldn't be here" );
-      exit ( 0 );
-    }
 
     ema_slow_period_vector = ta->taCalculateEMA ( cdip_map, ta->slowPeriod );
     ema_fast_period_vector = ta->taCalculateEMA ( cdip_map, ta->fastPeriod );
@@ -461,14 +452,10 @@ int main ( int argc, char *argv[] )
   //for (auto key : instrumentPriceMap)
 
   for ( auto [key, value] : ( *instrument_prices_map ) ) {
-    //sqli.rdiSqlite = instrumentPriceMap[key]->rdi;
     sqli.addReferenceData ( ( *instrument_prices_map ) [key] );
-
-    //sqli.fundSqlite = instrumentPriceMap[key]->funda;
     sqli.addFundamental ( ( *instrument_prices_map ) [key] );
-
-    //sqli.cdipMapSqlite = instrumentPriceMap[key]->pa.getCdipMapPointer();
     sqli.addPriceData ( ( *instrument_prices_map ) [key] );
+
 
     //Getting difference since previous day(s)
     //

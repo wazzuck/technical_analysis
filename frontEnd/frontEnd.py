@@ -1,17 +1,20 @@
-#!/usr/bin/python3
+#!/usr/bin/pypy3
 # vim:set bg=dark number : #
-import sqlite3, re, socket, sys, smtplib, ssl, leather, os, fcntl, struct
+import sqlite3, re, socket, sys, smtplib, ssl, leather, os, fcntl, struct, yaml
 from bottle import route, get, post, request, static_file, template, run # or route
 from datetime import date, datetime, timedelta
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-port = 587  # For SSL
-smtp_server = "smtp.gmail.com"
-sender_email="nevillebryce@gmail.com"
-receiver_email="nevillebryce@gmail.com"
-password = "pnaqqaixvzmelnzj"
+with open('/home/neville/vunderland/settings/googleAPI.yaml', 'r') as file:    
+    email_data = yaml.safe_load(file)    
+    
+port = email_data['port']    
+smtp_server = email_data['smtp_server']    
+sender_email = email_data['sender_email']    
+receiver_email = email_data['receiver_email']    
+password = email_data['password']
 
 """
 
@@ -65,13 +68,8 @@ def createPage(page="index"):
 		<th onclick="sortTable(1)">Industry</th>
 		<th onclick="sortTable(2)">Sector</th>
 		<th onclick="sortTable(3)">Market Segment Code</th>
-		<th onclick="sortTable(4)">Percentage Change</th>
-		<th onclick="sortTable(5)">Percentage Change 3 Days</th>
-		<th onclick="sortTable(6)">Percentage Change 5 Day</th>
-		<th onclick="sortTable(6)">PPO</th>
-		<th onclick="sortTable(7)">Market Cap</th>
-		<th onclick="sortTable(8)">Yahoo</th>
-		<th onclick="sortTable(9)">LSE</th>
+		<th onclick="sortTable(4)">Yahoo</th>
+		<th onclick="sortTable(5)">LSE</th>
 	</tr>
 """
 
@@ -87,50 +85,45 @@ def createPage(page="index"):
 	Look at interface to loads all data for an instruments.
 	"""
 
-	orderSql=' ORDER BY PERCENTAGE_DIFFERENCE_1'
+	orderBySql=' ORDER BY PERCENTAGE_DIFFERENCE_1'
 
 	#Note watch out for "," on second last item in the baseSql
 
-	baseSql="""SELECT INSTRUMENT_NAME,
-		 ICB_INDUSTRY,
-		 ICB_SUPER_SECTOR_NAME,
-		 MARKET_SEGMENT_CODE,
-		 PERCENTAGE_DIFFERENCE_1,
-		 PERCENTAGE_DIFFERENCE_3,
-		 PERCENTAGE_DIFFERENCE_5,
-		 MARKET_CAP,
-		 REFDATA.MNEMONIC,
-         LATEST_PPO
-		 FROM REFDATA JOIN TECHNICAL ON REFDATA.MNEMONIC = TECHNICAL.MNEMONIC"""
+	baseSql="""
+		SELECT
+		INSTRUMENT_NAME,
+		MNEMONIC,
+	    ICB_INDUSTRY,
+	    ICB_SUPER_SECTOR_NAME,
+	    MARKET_SEGMENT_CODE 
+	    FROM REFDATA
+	"""
 
 	if re.search("^industry", page):
 		sqlFilter=page.split("/")[1]
 		sql=' WHERE ICB_INDUSTRY = "' + sqlFilter + '"'
 		sql=baseSql + sql
-
 	elif re.search("^sector", page):
 		sqlFilter=page.split("/")[1]
 		sql=' WHERE ICB_SUPER_SECTOR_NAME = "' + sqlFilter + '"'
 		sql=baseSql + sql
-
 	elif re.search("^search", page):
 		sqlFilter=page.split("/")[1]
-
+		"""
 		if int(sqlFilter) > 0:
 			sql=' WHERE PERCENTAGE_DIFFERENCE_1 > "' + sqlFilter + '"'
 		else:
 			sql=' WHERE PERCENTAGE_DIFFERENCE_1 < "' + sqlFilter + '"'
 		sql=baseSql + sql
-
+		"""
 	elif re.search("^search_results", page):
 		sqlFilter=page.split("/")[1]
 		sql=' WHERE TECHNICAL.MNEMONIC = "' + sqlFilter + '"'
 		sql=baseSql + sql
-
 	elif page=="index":
 		sql=baseSql
 
-	sql = sql + orderSql
+	#sql = sql + orderBySql
 
 	sql = sql.strip()
 
@@ -141,38 +134,58 @@ def createPage(page="index"):
 	print("Finished SQL")
 
 	for displayItem in enumerate(cursor):
-
-
-		
-		
-
 		print(displayItem)
-		exit()
-
-
 
 		displayString = str (displayItem)
 		displayList = displayString.split(",")
+
+		instrument_name = displayList[1][3:-1]
+		mnemonic = displayList[2][2:-1]
+		icb_industry = displayList[3][2:-1]
+		icb_super_sector_name = displayList[4][2:-1]
+		market_segment_code = displayList[5][2:-3]
+
+		html+="\t<tr>\n"
+		if page=="index":
+			html+="\t\t<td><a href=instrument/" + mnemonic + " target=\"_blank\">" + instrument_name + "</a></td>\n"
+		else:
+			html+="\t\t<td>" + instrument_name + "</td>\n"
+		#TODO Replace " " space char in cpp code / database
+
+		if page=="index":
+			html+="\t\t<td><a href=industry/" + icb_industry + " target=\"_blank\">" + icb_industry + "</a></td>\n"
+			html+="\t\t<td><a href=sector/" + icb_super_sector_name + " target=\"_blank\">" + icb_super_sector_name + "</a></td>\n"
+		else:
+			html+="\t\t<td>" + icb_industry + "</td>\n"
+			html+="\t\t<td>" + icb_super_sector_name + "</td>\n"
+
+		html+="\t\t<td>" + market_segment_code + "</td>\n"
+		html+="\t\t<td><a href=\"https://uk.finance.yahoo.com/quote/" + mnemonic + ".L\" target=\"_blank\">" + mnemonic + "</a></td>\n"
+		html+="\t\t<td><a href=\"https://duckduckgo.com/?q=!ducky+" + mnemonic + "+site%3Alondonstockexchange.com\" target=\"_blank\">" + mnemonic + "</a></td>\n"
+		html+="\t</tr>\n"
+
+	"""
+	for displayItem in enumerate(cursor):
+
+		print(displayItem)
+		displayString = str (displayItem)
+		displayList = displayString.split(",")
+
 		instrument_name = displayList[1][3:-1]
 		icb_industry = displayList[2][2:-1]
+
 		if (displayList[3][-1] == "'"):
 			icb_super_sector_name = displayList[3][2:-1]
 			market_segment_code = displayList[4][2:-1]
-			percentage_difference_1 = displayList[5][1:-2]
-			percentage_difference_3 = displayList[6][1:-2]
-			percentage_difference_5 = displayList[7][1:-2]
 			market_cap = displayList[8]
 			mnemonic = displayList[9][2:-1]
 			print("Mnemonic " + mnemonic)
 			ppo = displayList[10][1:-2]
-		else:			
+		else:
 			#There's a comma in the icb_super_sector_name field
 			tempString = displayList[3] + "," + displayList[4]
 			icb_super_sector_name = tempString[2:-1]
 			market_segment_code = displayList[5][2:-1]
-			percentage_difference_1 = displayList[6][1:-2]
-			percentage_difference_3 = displayList[7][1:-2]
-			percentage_difference_5 = displayList[8][1:-2]
 			market_cap = displayList[9]
 			mnemonic = displayList[10][2:-1]
 			print("Mnemonic " + mnemonic)
@@ -192,9 +205,6 @@ def createPage(page="index"):
 			html+="\t\t<td>" + icb_super_sector_name + "</td>\n"
 
 		html+="\t\t<td>" + market_segment_code + "</td>\n"
-		html+="\t\t<td>" + str(percentage_difference_1) + "</td>\n"
-		html+="\t\t<td>" + str(percentage_difference_3) + "</td>\n"
-		html+="\t\t<td>" + str(percentage_difference_5) + "</td>\n"
 		html+="\t\t<td>" + str(ppo) + "</td>\n"
 		html+="\t\t<td>" + str(market_cap) + "</td>\n"
 		html+="\t\t<td><a href=\"https://uk.finance.yahoo.com/quote/" + mnemonic + ".L\" target=\"_blank\">" + mnemonic + "</a></td>\n"
@@ -202,6 +212,7 @@ def createPage(page="index"):
 		html+="\t</tr>\n"
 
 		break
+	"""
 
 	html+="""
 </table>
@@ -211,7 +222,6 @@ def createPage(page="index"):
 //
 //After much thought javascript is probably too slow to sort large tables on the fly
 //TODO Instead it is probably better to sort the data in the sqlite query and reload the table and refresh the page
-
 
 function sortTable(n) {
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -293,7 +303,7 @@ def convertTupleValueToDate(tupleValue):
 	return dateValue
 
 def createGraph(mnemonic):
-	sql="SELECT DATE, CLOSE, EMA30, EMA90 FROM " + mnemonic
+	sql="SELECT DATE, CLOSE, EMAFAST, EMASLOW FROM " + mnemonic
 	cursor = connection.execute(sql)
 
 	queryReturnTuple = cursor.fetchall()
@@ -308,15 +318,15 @@ def createGraph(mnemonic):
 	endGraphDate = convertTupleValueToDate(endDateTuple)
 
 	dateClosePriceTupleList = []
-	dateEMA30TupleList = []
-	dateEMA90TupleList = []
+	dateEMAFastTupleList = []
+	dateEMASlowTupleList = []
 	
 	for tupleValue in queryReturnTuple:
 		print("value " + str(tupleValue))
 		dateString = tupleValue[0]
 		closePrice = tupleValue[1]
-		sma30 = tupleValue[2]
-		sma90 = tupleValue[3]
+		emaFast = tupleValue[2]
+		emaSlow = tupleValue[3]
 		#print("dateString " + str(dateString) + " closePrice " + str(closePrice))
 
 		priceDate = convertTupleValueToDate(tupleValue)
@@ -324,22 +334,22 @@ def createGraph(mnemonic):
 		dateClosePriceTuple = (priceDate, float(closePrice))
 		dateClosePriceTupleList.append(dateClosePriceTuple)
 
-		if sma30 != 0.0:
-			dateEMA30Tuple = (priceDate, float(sma30))
-			dateEMA30TupleList.append(dateEMA30Tuple)
+		if emaFast != 0.0:
+			dateEMAFastTuple = (priceDate, float(emaFast))
+			dateEMAFastTupleList.append(dateEMAFastTuple)
 
-		if sma90 != 0.0:
-			dateEMA90Tuple = (priceDate, float(sma90))
-			dateEMA90TupleList.append(dateEMA90Tuple)
+		if emaSlow != 0.0:
+			dateEMASlowTuple = (priceDate, float(emaSlow))
+			dateEMASlowTupleList.append(dateEMASlowTuple)
 
 	print(dateClosePriceTupleList)
-	print(dateEMA30TupleList)
+	print(dateEMAFastTupleList)
 
 	chart=leather.Chart(mnemonic)
 	chart.add_x_scale(startGraphDate, endGraphDate)
 	chart.add_line(dateClosePriceTupleList, name="Close Prices")
-	chart.add_line(dateEMA30TupleList, name="EMA30")
-	chart.add_line(dateEMA90TupleList, name="EMA90")
+	chart.add_line(dateEMAFastTupleList, name="EMAFAST")
+	chart.add_line(dateEMASlowTupleList, name="EMASLOW")
 	chart.to_svg('/dev/shm/' + mnemonic + '.svg')
 
 @route('/instrument/<mnemonic>')
@@ -348,7 +358,7 @@ def displayGraph(mnemonic):
 	createGraph(mnemonic)
 	graph_file=static_file(filename, root='/dev/shm/')
 
-	return template('/home/neville/vunderland/eod/scripts/graph_fullscreen.tpl',param=filename)
+	return template('/home/neville/technical_analysis/frontEnd/graphFullScreen.tpl',param=filename)
 
 """Serve up the graph file to the client web browser"""
 @route('/static/<filename>')
@@ -393,8 +403,8 @@ def search():
 
 @post('/search') # or @route('/login', method='POST')
 def do_search():
-	searchItem = request.forms.get('pchange')
-	url="search/" + searchItem
+	search_item = request.forms.get('pchange')
+	url="search/" + search_item
 	searchResultsPage = createPage(url)
 	return searchResultsPage
 
@@ -417,7 +427,7 @@ def exists(fileToCheck):
 		return False
 
 #https://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-from-nic-in-python
-def get_ip_address(ifname):
+def getIPAdress(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
@@ -429,7 +439,7 @@ def get_ip_address(ifname):
 # GLOBALS
 #############################################################################################
 
-databaseDirectory = "/dev/shm/"
+database_directory = "/dev/shm/"
 
 #############################################################################################
 # MAIN METHOD
@@ -442,70 +452,69 @@ if __name__ == '__main__':
 	print ('Argument List:', str(sys.argv))
 
 	if len(sys.argv) > 1:
-		dateInFileNameString = sys.argv[1]
-		db = databaseDirectory + dateInFileNameString + ".eod.db"
+		#TODO Think of a better var name than "date_in_filename_string"
+		date_in_filename_string = sys.argv[1]
+		db = database_directory + date_in_filename_string + ".eod.db"
 
 		if not exists(db):
-			print("exiting")
-			sys.exit(0)
+			print("Database not found.")
+			sys.exit(1)
 
 	else:
-		dateInFileName = date.today()
-		print("Today's date:", dateInFileName)
+		date_in_filename = date.today()
+		print("Today's date:", date_in_filename)
 
-		num_days_to_subtract = 1
-
-		if socket.gethostname() == "localhost.localdomain" or "penguin":
+		if socket.gethostname() == "penguin":
 			#More retries when debugging
 			print("Running on laptop")
-			numReTries = 100
+			num_retries = 100
 		else:
-			print("Running on server")
-			numReTries = 5
+			print("Running in live environment")
+			num_retries = 5
 
-		for x in range(numReTries):
-			dateInFileNameString = dateInFileName.strftime("%Y%m%d")
-			print(dateInFileName)
-
-			db = databaseDirectory + dateInFileNameString + ".eod.db"
+		for x in range(num_retries):
+			date_in_filename_string = date_in_filename.strftime("%Y%m%d")
+			db = database_directory + date_in_filename_string + ".eod.db"
 
 			if exists(db):
 				break
 			else:
-				dateInFileName = dateInFileName - timedelta(days=num_days_to_subtract)
+				#TODO What is this for again?
+				num_days_to_subtract = 1
+				date_in_filename = date_in_filename - timedelta(days=num_days_to_subtract)
 
 	connection = sqlite3.connect(db)
 	cursor = connection.cursor()
 	print("Connecting to " + db)
 
 	if sys.stdin.isatty():
-		# running interactively
-		print ("Running interactively starting Bottle")
-
+		print ("Running from terminal. Starting bottle")
 	else:
+		print ("Running from cron. Generating email and starting bottle")
+
 		#Move email generator to above stanza for testing or put into a method and add an 'if check'
 		
 		#Generating gainers of > X%
 
-		emailHtml = "<h1>Gainers</h1>"
+		email_html = "<h1>Gainers</h1>"
 
 		pchange="6"
-		searchItem = pchange
-		url="search/" + searchItem
-		emailHtml += createPage(url)
+		search_item = pchange
+		url="search/" + search_item
+		email_html += createPage(url)
 
 		#Generating losers of < -X%
-		emailHtml += "<h1>Losers</h1>"
+		email_html += "<h1>Losers</h1>"
 		pchange="-6"
-		searchItem = pchange
-		url="search/" + searchItem
-		emailHtml += createPage(url)
+		search_item = pchange
+		url="search/" + search_item
+		email_html += createPage(url)
 
 		msg = MIMEMultipart()
 		msg['From'] = 'nevillebryce@gmail.com'
 		msg['To'] = 'nevillebryce@gmail.com'
 		msg['Subject'] = 'Today in the market'
-		msg.attach(MIMEText(emailHtml, 'html'))
+		msg.attach(MIMEText(email_html, 'html'))
 		# Create a secure SSL context
 		context = ssl.create_default_context()
 
@@ -519,10 +528,11 @@ if __name__ == '__main__':
 			server.sendmail(sender_email, receiver_email, msg.as_string())
 
 	if socket.gethostname() == "rpi":
-		NIC = get_ip_address('end0')
+		NIC = getIPAdress('end0')
 	else:
 		NIC="127.0.0.1"
 
 	PORT=8080
 
+	#Starting bottle
 	run(host=NIC, port=PORT, debug=True, reloader=True)

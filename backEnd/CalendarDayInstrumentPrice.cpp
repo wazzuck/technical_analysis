@@ -34,17 +34,15 @@ void CalendarDayInstrumentPrice::setMnemonic ( const string &mnemonic )
   //TLOG( << mnemonic);
   mMnemonic = mnemonic;
 
-  regex dot_L ( ".*\*.L" );
-
-  if ( regex_search ( mMnemonic, dot_L ) ) {
+  regex dot_L ( R"(^.*\.L)" );
+  if ( regex_match ( mMnemonic, dot_L ) ) {
     //DLOG("Removing the .L from " << mMnemonic);
     mMnemonic.erase ( mMnemonic.length()-2 );
   }
 
-  regex pattern ( "^..\.." );
-
-  if ( regex_match ( mMnemonic, pattern ) ) {
-    //TLOG("found regex");
+  regex dot ( "^..\\.." );
+  if ( regex_match ( mMnemonic, dot ) ) {
+    //LOG("Replacing the \".\" in BT.A with an \"_\"");
     mMnemonic.replace ( 2, 1, "_" );
   }
 }

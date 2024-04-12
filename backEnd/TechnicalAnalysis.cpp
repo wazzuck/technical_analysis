@@ -457,10 +457,6 @@ void TechnicalAnalysis::clearStochasticVec()
 /*Price Position Oscillator
  *
  * https://www.youtube.com/watch?v=T4O4n8QtWCU
- *
- *
- * */
-
 /*
     void TechnicalAnalysis::taSetPPO(map <string, CalendarDayInstrumentPrice> cdipMap)
   {

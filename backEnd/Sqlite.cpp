@@ -81,21 +81,6 @@ Sqlite::Sqlite ( string absoluteDatabaseFileName )
         "\t\tPTB                            TEXT        NOT NULL\n);";
 
   runSql ( sql );
-
-  /*
-  LOG("Creating Technical Table");
-
-  sql = "CREATE TABLE TECHNICAL(\n"
-      "\t\tTECHNICAL_ID INT PRIMARY           KEY     NOT NULL,\n" \
-      "\t\tMNEMONIC                           TEXT    NOT NULL,\n" \
-      "\t\tPERCENTAGE_DIFFERENCE_1            REAL    NOT NULL,\n" \
-      "\t\tPERCENTAGE_DIFFERENCE_3            REAL    NOT NULL,\n" \
-      "\t\tPERCENTAGE_DIFFERENCE_5            REAL    NOT NULL,\n" \
-      "\t\tMARKET_CAP                         REAL    NOT NULL,\n" \
-      "\t\tLATEST_PPO                         REAL    NOT NULL\n);";
-
-  runSql(sql);
-  */
 }
 
 void Sqlite::addReferenceData ( InstrumentPrices *ip )
@@ -120,9 +105,9 @@ void Sqlite::addReferenceData ( InstrumentPrices *ip )
         ip->rdi.getMarketSegmentCode() + "', '" + \
         ip->rdi.getMarketSectorCode() + "');";
 
-  runSql ( sql );
-
   refCount++;
+
+  runSql ( sql );
 }
 
 void Sqlite::addFundamental ( InstrumentPrices *ip )
@@ -144,14 +129,13 @@ void Sqlite::addFundamental ( InstrumentPrices *ip )
         ip->funda.getPtS() + "', '" + \
         ip->funda.getPtB() + "');";
 
-  runSql ( sql );
-
   fundCount++;
+
+  runSql ( sql );
 }
 
 void Sqlite::addPriceData ( InstrumentPrices *ip )
 {
-
   string price_table_name = ip->rdi.getMnemonic();
   LOG ( "Creating Price Table for " << price_table_name );
 
@@ -164,19 +148,17 @@ void Sqlite::addPriceData ( InstrumentPrices *ip )
         "\t\tLOW                                        REAL        NOT NULL,\n" \
         "\t\tCLOSE                                      REAL        NOT NULL,\n" \
         "\t\tVOLUME                                     INTEGER     NOT NULL,\n" \
-        "\t\tEMAFast                                    REAL        NOT NULL,\n" \
-        "\t\tEMASlow                                    REAL        NOT NULL,\n" \
+        "\t\tEMAFAST                                    REAL        NOT NULL,\n" \
+        "\t\tEMASLOW                                    REAL        NOT NULL,\n" \
         "\t\tMACD                                       REAL        NOT NULL\n);";
 
   runSql ( sql );
 
-  sql = "INSERT INTO " + price_table_name + " (" + price_table_name + ",MNEMONIC, DATE, OPEN, HIGH, LOW, CLOSE, VOLUME, EMAFast, EMASlow, MACD) VALUES\n";
+  sql = "INSERT INTO " + price_table_name + " (" + price_table_name + ",MNEMONIC, DATE, OPEN, HIGH, LOW, CLOSE, VOLUME, EMAFAST, EMASLOW, MACD) VALUES\n";
 
   map<string, CalendarDayInstrumentPrice *> *cdipMapPtr = ip->pa.getCdipMapPointer();
 
   for ( auto i = cdipMapPtr->rbegin(); i != cdipMapPtr->rend(); ++i ) {
-    //(*cdipMapSqlite)[i->first]->printCalendarDayInstrumentPrice();
-
     sql += "\t(" + \
            to_string ( priceTableCount ) + ", '" + \
            i->second->getMnemonic() + "', '" + \
@@ -189,10 +171,7 @@ void Sqlite::addPriceData ( InstrumentPrices *ip )
            to_string ( i->second->getEMAFast() ) + ", " + \
            to_string ( i->second->getEMASlow() ) + ", " + \
            to_string ( i->second->getMACD() ) + "),\n"; //WATCH out for extra ' characters on strings
-
     priceTableCount++;
-
-    //break;
   }
 
   //Replace last ",\n" with a ";"
@@ -200,75 +179,68 @@ void Sqlite::addPriceData ( InstrumentPrices *ip )
   sql.pop_back();
   sql += ";";
 
-//        sql = "INSERT INTO " + price_table_name + " VALUES(" + to_string(priceTableCount) + ", '" + cdipMapSqlite[i->first].getMnemonic() + "', '" + cdipMapSqlite[i->first].getDate() + "', " + to_string(cdipMapSqlite[i->first].getOpen()) + ", " + to_string(cdipMapSqlite[i->first].getHigh()) + ", " + to_string(cdipMapSqlite[i->first].getLow()) + ", " + to_string(cdipMapSqlite[i->first].getClose()) + ", " + to_string(cdipMapSqlite[i->first].getVolume()) + ");";
-
   runSql ( sql );
-
-  //priceTableCount++;
 }
 
 /*
-void Sqlite::addTechnical()
+void Sqlite::addTechnical ( InstrumentPrices *ip )
 {
-DLOG("Running addTechnical()");
-    string percentagePriceChangeSql = "";
+  DLOG ( "Running addTechnical()" );
+  string percentagePriceChangeSql = "";
 
-    for (auto const& priceChangeElement : taSqlite.getPercentageChanges())
-    {
-        // Accessing KEY from element
-        int numberOfDays = priceChangeElement.first;
-        double percentageChange = priceChangeElement.second;
-        LOG("numberOfDays " << numberOfDays << "percentageChange " << percentageChange);
+  for ( auto const &priceChangeElement : taSqlite.getPercentageChanges() ) {
+    // Accessing KEY from element
+    int numberOfDays = priceChangeElement.first;
+    double percentageChange = priceChangeElement.second;
+    LOG ( "numberOfDays " << numberOfDays << "percentageChange " << percentageChange );
 
-        //TODO Can I dynamically modify the schema if additional days are added?
-        percentagePriceChangeSql += to_string(priceChangeElement.second) + "," ;
-    }
+    //TODO Can I dynamically modify the schema if additional days are added?
+    percentagePriceChangeSql += to_string ( priceChangeElement.second ) + "," ;
+  }
 
-    LOG("Percentage Change " << percentagePriceChangeSql);
+  LOG ( "Percentage Change " << percentagePriceChangeSql );
 
-    double PPO = 0.0;
+  double PPO = 0.0;
 
 //Get the last value in the cdipMap as the PPO
-    for (auto rit = cdipMapSqlite.rbegin(); rit != cdipMapSqlite.rend(); ++rit)
-    {
-        PPO = rit->second.getPPO();
-  break;
-    }
+  for ( auto rit = cdipMapSqlite.rbegin(); rit != cdipMapSqlite.rend(); ++rit ) {
+    PPO = rit->second.getPPO();
+    break;
+  }
 
-    sql = "INSERT INTO TECHNICAL VALUES(" + \
-            to_string(technicalCount) + ",'" + \
-            rdiSqlite.getMnemonic() + "'," + \
+  sql = "INSERT INTO TECHNICAL VALUES(" + \
+        to_string ( technicalCount ) + ",'" + \
+        rdiSqlite.getMnemonic() + "'," + \
 
-            to_string(taSqlite.getMarketCap()) + "," + \
-            to_string(PPO) + ");";
+        to_string ( taSqlite.getMarketCap() ) + "," + \
+        to_string ( PPO ) + ");";
 
-cdipMapSqlite.end().printCalendarDayInstrumentPrice();
+  cdipMapSqlite.end().printCalendarDayInstrumentPrice();
 
-runSql(sql);
+  runSql ( sql );
 
-exit(0);
+  exit ( 0 );
 
-    technicalCount++;
+  technicalCount++;
 }
 */
 
 void Sqlite::runSql ( const string &inSql )
 {
-  DLOG ( "Running runSql" );
-
   returnCode = sqlite3_exec ( db, inSql.c_str(), NULL, NULL, &zErrMsg );
   LOG ( "Return code " << returnCode );
   //LOG( << zErrMsg); // BUG DOES NOT PRINT OUT ERR MSG
 
   if ( returnCode ) {
     ELOG ( << inSql );
-    ELOG ( ":Error running sql " << sqlite3_errmsg ( db ) );
+    ELOG ( "Error running sql " << sqlite3_errmsg ( db ) );
     exit ( 1 );
   }
-  else {
-    LOG ( "sql ran successfully" );
-    LOG ( << inSql );
-  }
+
+  // else {
+  //   LOG ( "sql ran successfully" );
+  //   LOG ( << inSql );
+  // }
 }
 
 void Sqlite::closeDB()
