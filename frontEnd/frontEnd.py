@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+<<<<<<< HEAD
 with open('/home/neville/vunderland/settings/googleAPI.yaml', 'r') as file:    
     email_data = yaml.safe_load(file)    
     
@@ -15,6 +16,9 @@ smtp_server = email_data['smtp_server']
 sender_email = email_data['sender_email']    
 receiver_email = email_data['receiver_email']    
 password = email_data['password']
+=======
+
+>>>>>>> refs/remotes/origin/main
 
 """
 
