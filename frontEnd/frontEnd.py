@@ -7,7 +7,6 @@ from datetime import date, datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-<<<<<<< HEAD
 with open('/home/neville/vunderland/settings/googleAPI.yaml', 'r') as file:    
     email_data = yaml.safe_load(file)    
     
@@ -16,9 +15,6 @@ smtp_server = email_data['smtp_server']
 sender_email = email_data['sender_email']    
 receiver_email = email_data['receiver_email']    
 password = email_data['password']
-=======
-
->>>>>>> refs/remotes/origin/main
 
 """
 
@@ -165,8 +161,9 @@ def createPage(page="index"):
 
 		html+="\t\t<td>" + market_segment_code + "</td>\n"
 		html+="\t\t<td><a href=\"https://uk.finance.yahoo.com/quote/" + mnemonic + ".L\" target=\"_blank\">" + mnemonic + "</a></td>\n"
-		html+="\t\t<td><a href=\"https://duckduckgo.com/?q=!ducky+" + mnemonic + "+site%3Alondonstockexchange.com\" target=\"_blank\">" + mnemonic + "</a></td>\n"
-		html+="\t</tr>\n"
+		#html+="\t\t<td><a href=\"https://duckduckgo.com/?q=%5C+" + mnemonic + "+londonstockexchange.com\" target=\"_blank\">" + mnemonic + "</a></td>\n"
+		html+="\t\t<td><a href=\"https://duckduckgo.com/?q=\\soybeans\" target=\"_blank\">" + mnemonic + "</a></td>\n"
+		html+="\t</tr>\n"                  
 
 	"""
 	for displayItem in enumerate(cursor):
@@ -212,7 +209,7 @@ def createPage(page="index"):
 		html+="\t\t<td>" + str(ppo) + "</td>\n"
 		html+="\t\t<td>" + str(market_cap) + "</td>\n"
 		html+="\t\t<td><a href=\"https://uk.finance.yahoo.com/quote/" + mnemonic + ".L\" target=\"_blank\">" + mnemonic + "</a></td>\n"
-		html+="\t\t<td><a href=\"https://duckduckgo.com/?q=!ducky+" + mnemonic + "+site%3Alondonstockexchange.com\" target=\"_blank\">" + mnemonic + "</a></td>\n"
+		html+="\t\t<td><a href=\"https://duckduckgo.com/?q=!ducky+" + mnemonic + "+londonstockexchange.com\" target=\"_blank\">" + mnemonic + "</a></td>\n"
 		html+="\t</tr>\n"
 
 		break
