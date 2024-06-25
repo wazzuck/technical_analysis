@@ -50,6 +50,8 @@ def getFile(file):
 
 			ftp.quit()
 
+			print("Successfully downloaded " + file)
+
 		else:
 			print(len(pathSplit))
 			print("using absolute method")
@@ -63,11 +65,8 @@ def getFile(file):
 			print(file)
 
 			ftp = FTP(URL)
-
 			ftp.login(user=U, passwd=P)
-
 			ftp.cwd(path)
-
 			#ftp.retrlines('LIST')   -- Debug
 
 			with open(directory + "_" + absoluteFile, 'wb') as fp:
@@ -75,11 +74,13 @@ def getFile(file):
 
 			ftp.quit()
 
+			print("Successfully downloaded " + file)
+
 	except:
 		global ERROR
 		global email_body
 		print("Error occurred downloading " + file)
-		email_body+="Error downloading " + file
+		email_body+="Error downloading " + file + "\n"
 		ERROR=True
 			
 #############################################################################################
