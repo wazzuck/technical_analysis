@@ -153,57 +153,56 @@ int main ( int argc, char *argv[] )
     date_to_be_loaded = nowDate.getNextDate();
   }
 
-  //DLOG("Running Market Cap");
-  //ip.pa.t->setMarketCap = ta.getMarketCap(ip.getNextLastCalendarDayInstrumentClosePrice(0), ip.funda.getShares());
+    vector<double> *ema_slow_period_vector = new vector<double>;
+    vector<double> *ema_fast_period_vector = new vector<double>;
+    vector<double> *macd_vector = new vector<double>;
+    vector<double> *stochastic_vector = new vector<double>;
 
-  DLOG ( "Running fastEMA" );
+  map<string, CalendarDayInstrumentPrice *> *cdip_map = ip.pa.getCdipMapPointer();
+
+  DLOG("Running getMarketCap");
+  (cdip_map)
+
+    for ( auto it = cdip_map->begin(); it != cdip_map->end(); ++it ) {
+      if ( count == macd_vec_size ) {
+        break;
+      }
+
+      //DLOG ( "(*ema_fast_period_vector)[count] " << ( *ema_fast_period_vector ) [count] );
+      it->second->setEMAFast ( ( *ema_fast_period_vector ) [count] );
+      //DLOG ( "(*ema_slow_period_vector)[count] " << ( *ema_slow_period_vector ) [count] );
+      it->second->setEMASlow ( ( *ema_slow_period_vector ) [count] );
+      //DLOG ( "(*macdVecPtr)[count] " << ( *macd_vector ) [count] );
+      it->second->setMACD ( ( *macd_vector ) [count] );
+
+      /*
+      it->second->setPercentageChange(ta->taGetPercentageChanges(cdip_map, count));
+      it->second->setPercentageChange(ta->taGetPercentageChanges(cdip_map, count));
+      */
+
+      count++;
+    }
+    instrument_price_iter++;
+  }
+
+
+
+  -> = ta.getMarketCap(ip.getNextLastCalendarDayInstrumentClosePrice(0), ip.funda.getShares());
+
+  LOG ( "Running fastEMA" );
   ip.pa.t->emaFastPeriodVecPtr = ta.taCalculateEMA ( ip.pa.getCdipMapPointer(), ta.fastPeriod );
 
-  DLOG ( "Running slowEMA" );
+  LOG ( "Running slowEMA" );
   ip.pa.t->emaSlowPeriodVecPtr = ta.taCalculateEMA ( ip.pa.getCdipMapPointer(), ta.slowPeriod );
 
-  DLOG ( "Running MACD" );
+  LOG ( "Running MACD" );
   ip.pa.t->macdVecPtr = ta.taCalculateMACD ( ip.pa.getCdipMapPointer() );
 
-  ip.PrintInstrumentPrices();
-
-  /*
-
-  exit(0);
-
-  //ta.taGetEMA(ip.pa.getCdipMapPointer());
-  //ip.ipSetEMA(ta.taGetEMA(), fastPeriod);
-  //ta.clearEMAVec();
-
-  //ta.setPercentageChanges(ip, 2);
-  //LOG("Percentage change " << ta.getPercentageChanges()[2]);
-
-  /*
-   *
-  ta.taSetEMA(cdipMap, slowPeriod);
-  ip.ipSetEMA(ta.taGetEMA(), slowPeriod);
-  ta.clearEMAVec();
-
-  ta.taSetMACD(cdipMap, fastPeriod, slowPeriod, signalPeriod);
-  ip.ipSetMACD(ta.taGetMACD(), fastPeriod + 7);
-
-  ta.taSetStochastic(cdipMap);
-  ip.ipSetStochastic(ta.taGetStochastic());
-  ta.clearStochasticVec();
-
-  ta.setOneDayPercentageChange(ip.getNextLastCalendarDayInstrumentClosePrice(0), ip.getNextLastCalendarDayInstrumentClosePrice(1));
-  LOG("One Day " << ta.getOneDayPercentageChange());
-
-  ta.setThreeDayPercentageChange(ip.getNextLastCalendarDayInstrumentClosePrice(0), ip.getNextLastCalendarDayInstrumentClosePrice(3));
-  LOG("Three day " << ta.getThreeDayPercentageChange());
-
-  ta.setFiveDayPercentageChange(ip.getNextLastCalendarDayInstrumentClosePrice(0), ip.getNextLastCalendarDayInstrumentClosePrice(5));
-  LOG("Five day " << ta.getFiveDayPercentageChange());
+  LOG ( "Running getPercentageChanges");
+  ta.getPercentageChanges( ip.pa.getCdipMapPointer() , 2);
 
   ip.PrintInstrumentPrices();
   exit(0);
-
-  */
 
   /*
   //Sneaky TA Lib Stuff

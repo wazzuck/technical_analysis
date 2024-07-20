@@ -390,6 +390,7 @@ int main ( int argc, char *argv[] )
     vector<double> *ema_slow_period_vector = new vector<double>;
     vector<double> *ema_fast_period_vector = new vector<double>;
     vector<double> *macd_vector = new vector<double>;
+    vector<double> *stochastic_vector = new vector<double>;
 
     ema_slow_period_vector = ta->taCalculateEMA ( cdip_map, ta->slowPeriod );
     ema_fast_period_vector = ta->taCalculateEMA ( cdip_map, ta->fastPeriod );
@@ -410,11 +411,13 @@ int main ( int argc, char *argv[] )
     // emaSlowPeriodVecPtr 95
     // emaFastPeriodVecPtr 109
 
+    stochastic_vector = ta->taGetStochastic( instrument_price_iter->second->pa.getCdipMapPointer() );
+
     int count = 0;
-    int macdVecSize = ( *macd_vector ).size();
+    int macd_vec_size = ( *macd_vector ).size();
 
     for ( auto it = cdip_map->begin(); it != cdip_map->end(); ++it ) {
-      if ( count == macdVecSize ) {
+      if ( count == macd_vec_size ) {
         break;
       }
 
@@ -425,12 +428,40 @@ int main ( int argc, char *argv[] )
       //DLOG ( "(*macdVecPtr)[count] " << ( *macd_vector ) [count] );
       it->second->setMACD ( ( *macd_vector ) [count] );
 
+      it->second->setPercentageChange(ta->taGetPercentageChanges(cdip_map, count));
+
+      it->second->setPercentageChange(ta->taGetPercentageChanges(cdip_map, count));
+
+
+
+
+      //Only apply this to the first value
+
+
+      //Calculate percentage changes for 1,3,5 days
+      /*
+      it->second->setOneDayPercentageChange(ta->getPercentageChanges(cdip_map, 1));
+      it->second->setThreeDayPercentageChange(ta->getPercentageChanges(cdip_map, 3));
+      it->second->setFiveDayPercentageChange(ta->getPercentageChanges(cdip_map, 5));
+      */
+
       count++;
     }
+
     instrument_price_iter++;
   }
 
+
+
   LOG ( "Finished calculating technical data" );
+
+  ( *instrument_prices_map ) ["VOD"]->PrintInstrumentPrices();
+
+  exit ( 0 );
+
+
+
+
 
   //##############################################################################
   // Sqlite
@@ -455,7 +486,6 @@ int main ( int argc, char *argv[] )
     sqli.addReferenceData ( ( *instrument_prices_map ) [key] );
     sqli.addFundamental ( ( *instrument_prices_map ) [key] );
     sqli.addPriceData ( ( *instrument_prices_map ) [key] );
-
 
     //Getting difference since previous day(s)
     //

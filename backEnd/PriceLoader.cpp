@@ -36,7 +36,7 @@ map<string, CalendarDayInstrumentPrice *> *PriceLoader::getPrices ( const string
     isCsv = true;
   }
   else {
-    LOG ( "Neither " + fileName + ".txt or " + fileName + ".csv" << "  exist" );
+    LOG ( "Neither " + fileNameStem + fileName + ".txt or " + fileNameStem + fileName + ".csv" << "  exist" );
     exit ( 1 );
   }
 

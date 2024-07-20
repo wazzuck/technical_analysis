@@ -18,56 +18,24 @@ TechnicalAnalysis::TechnicalAnalysis()
   , slowPeriod ( 26 )
   , signalPeriod ( 9 )
 {
-  map <int, double> percentageChanges;
   TA_Initialize();
 }
 
-/*
-* Percentage difference beteween the Last Close Price and the Close Price numberOfDays of days before
-*/
-//double TechnicalAnalysis::getPercentageChanges(map <string, CalendarDayInstrumentPrice> cdipMap, int numberOfDays)
-
-double TechnicalAnalysis::getPercentageChanges ( double LastPrice, double ComparisonPrice )
+double TechnicalAnalysis::taGetPercentageChanges ( map <string, CalendarDayInstrumentPrice *> *cdipMap, int number_of_days )
 {
-  double percentageChange = ( ( LastPrice - ComparisonPrice ) / ComparisonPrice ) * 100;
-  return percentageChange;
+  auto last_cdip = ( *cdipMap ).rbegin();
+  //last_cdip->second->printCalendarDayInstrumentPrice();
+  auto last_close_price = last_cdip->second->getClose();
+
+  auto n_last_cdip = next ( ( *cdipMap ).rbegin(), number_of_days );
+  //n_last_cdip->second->printCalendarDayInstrumentPrice();
+  auto n_last_close_price = n_last_cdip->second->getClose();
+
+  double percentage_change = ( ( last_close_price - n_last_close_price ) / n_last_close_price ) * 100;
+  //DLOG("percentage_change " << percentage_change);
+
+  return percentage_change;
 }
-
-/*
-void TechnicalAnalysis::setOneDayPercentageChange(double LastPrice, double ComparisonPrice)
-{
-    mOneDayPercentageChange = getPercentageChanges(LastPrice, ComparisonPrice);
-}
-
-double TechnicalAnalysis::getOneDayPercentageChange()
-{
-    return mOneDayPercentageChange;
-}
-
-void TechnicalAnalysis::setThreeDayPercentageChange(double LastPrice, double ComparisonPrice)
-{
-    mThreeDayPercentageChange = getPercentageChanges(LastPrice, ComparisonPrice);
-}
-
-double TechnicalAnalysis::getThreeDayPercentageChange()
-{
-    return mThreeDayPercentageChange;
-}
-
-void TechnicalAnalysis::setFiveDayPercentageChange(double LastPrice, double ComparisonPrice)
-{
-    mFiveDayPercentageChange = getPercentageChanges(LastPrice, ComparisonPrice);
-}
-
-double TechnicalAnalysis::getFiveDayPercentageChange()
-{
-    return mFiveDayPercentageChange;
-}
-
-*/
-
-
-
 
 /*
  * TODO I'd prefer to move the check for whether enough days have been loaded from the Main function to inside TA.'
@@ -80,41 +48,6 @@ if (MAX_DAYS_LOADED < fastPeriod)
   exit(1);
 }
 }
-*/
-
-/*
- * TODO This can prob be removed
- *
-TBC TechnicalAnalysis::taSetFastSlowEMA(map <string, CalendarDayInstrumentPrice> cdipMap)
-{
-mEMAFastPeriod = taSetEMA(cdipMap, fastPeriod);
-//ta.clearEMAVec(); // Is this needed?
-
-mEMASlowPeriod = taSetEMA(cdipMap, slowPeriod);
-//ta.clearEMAVec();
-}
-
-
-*/
-
-
-
-/*
-int TechnicalAnalysis::getFastPeriod()
-{
-    return fastPeriod;
-}
-
-int TechnicalAnalysis::getSlowPeriod()
-{
-return slowPeriod;
-}
-
-int TechnicalAnalysis::getSignalPeriod()
-{
-    return signalPeriod;
-}
-
 */
 
 //EMA - Exponential Moving Average
@@ -154,10 +87,10 @@ vector <double> *TechnicalAnalysis::taCalculateEMA ( map <string, CalendarDayIns
   int outBegIdxEMA= 0;
 
   TA_RetCode res = TA_EMA ( 0, closePriceArray_size-1,        // data range
-                            closePriceArray,                                // data pointer
-                            numberOfDays,                                   // TA Func specific args
-                            &outBegIdx, &outNbElement,                      // relative index and size of results
-                            outEMA );                                       // arrays of results
+                            closePriceArray,                  // data pointer
+                            numberOfDays,                     // TA Func specific args
+                            &outBegIdx, &outNbElement,        // relative index and size of results
+                            outEMA );                         // arrays of results
 
   if ( res == TA_SUCCESS ) {
     /*
@@ -317,141 +250,113 @@ void TechnicalAnalysis::clearMACDVec()
 *
 */
 
-
-/*
-void TechnicalAnalysis::taSetStochastic(map <string, CalendarDayInstrumentPrice> cdipMap)
+vector<double> *TechnicalAnalysis::taGetStochastic ( map <string, CalendarDayInstrumentPrice *> *cdipMap )
 {
-    for (auto cdip: cdipMap)
-    {
-            //According to CMC here https://www.cmcmarkets.com/en-gb/trading-guides/what-is-a-stochastic-indicator
+  for ( auto cdip : ( * cdipMap ) )  {
+    //According to CMC here https://www.cmcmarkets.com/en-gb/trading-guides/what-is-a-stochastic-indicator
     // The high / low should be taken from the last 14 days?
     // At the moment there is an issue where the sample is currently coming fromt he same day and if the price does not move then
     // a division by 0 leads to a "nan" float which is then rejected when being put in the sqlite DB
 
+
+    //TODO Slide the 14 day lookback window back 1 each loop iteration.
+
     int numberOfDaysLookBack = 14;
+    double high = taGetHighest ( cdipMap, numberOfDaysLookBack );
+    double low = taGetLowest ( cdipMap, numberOfDaysLookBack );
+    double close = cdip.second->getClose();
 
-    //ip.PrintInstrumentPrices();
+    double lowToCloseRange = close - low;
+    double lowToHighRange = high - low;
+    double stochastic = ( lowToCloseRange / lowToHighRange ) * 100;
 
-            double high = taGetHighest(cdipMap , numberOfDaysLookBack);
-            double low = taGetLowest(cdipMap , numberOfDaysLookBack);
-            double close = cdip.second.getClose();
-
-            double lowToCloseRange = close - low;
-            double lowToHighRange = high - low;
-            double stochastic = (lowToCloseRange / lowToHighRange) * 100;
-
-    outStochasticVec.push_back(stochastic);
-    }
+    ( *outStochasticVec ).push_back ( stochastic );
+  }
+  return outStochasticVec;
 }
-
-*/
 
 /* Get lowest price over the last numberDays
 *  Look through all the low values to find which is lowest */
-
-/*
-double TechnicalAnalysis::taGetLowest(map <string, CalendarDayInstrumentPrice> cdipMap, int numberDays)
+double TechnicalAnalysis::taGetLowest ( map <string, CalendarDayInstrumentPrice *> *cdipMap, int numberDays )
 {
-    //LOG("Running taGetLowest");
+  //LOG("Running taGetLowest");
 
-    float lowest = 0.0;
-    float low = 0.0;
+  float lowest = 0.0;
+  float low = 0.0;
 
-    int count = 0;
-    //for (auto cdip: ip.cdipMap)
+  int count = 0;
+  //for (auto cdip: ip.cdipMap)
 
   // Iterate through the map in reverse order
-  for (auto rit = cdipMap.rbegin(); rit != cdipMap.rend(); ++rit)
-    {
-      //TLOG("Checking for date " << rit->second.getDate());
+  for ( auto rit = ( * cdipMap ).rbegin(); rit != ( *cdipMap ).rend(); ++rit ) {
+    //TLOG("Checking for date " << rit->second.getDate());
 
-        if (count == numberDays - 1)
-        {
-            //LOG("taGetLowest count == numberDays break");
-            break;
-        }
-
-        if (count == 0)
-        {
-            lowest = rit->second.getLow();
-    //TLOG("Setting initial lowest value " << lowest);
-    count++;
-    continue;
-        }
-  else
-  {
-    low = rit->second.getLow();
-    //LOG("Checking low value " << to_string(low));
-
-    if (low < lowest)
-    {
-      lowest = low;
-      //LOG("Found new lowest value " << to_string(low));
+    if ( count == numberDays - 1 ) {
+      //LOG("taGetLowest count == numberDays break");
+      break;
     }
-          count++;
+
+    if ( count == 0 ) {
+      lowest = rit->second->getLow();
+      //TLOG("Setting initial lowest value " << lowest);
+      count++;
+      continue;
+    }
+    else {
+      low = rit->second->getLow();
+      //LOG("Checking low value " << to_string(low));
+
+      if ( low < lowest ) {
+        lowest = low;
+        //LOG("Found new lowest value " << to_string(low));
+      }
+
+      count++;
+    }
   }
-    }
-    return lowest;
-}
 
-*/
+  return lowest;
+}
 
 /* Get highest price over the last numberDays
 *  Look through all the low values to find which is highest */
-
-/*
-double TechnicalAnalysis::taGetHighest(map <string, CalendarDayInstrumentPrice> cdipMap, int numberDays)
+double TechnicalAnalysis::taGetHighest ( map <string, CalendarDayInstrumentPrice *> *cdipMap, int numberDays )
 {
-    //LOG("Running taGetHighest");
+  //LOG("Running taGetHighest");
 
-    double highest = 0.0;
-    double high = 0.0;
-
-    int count = 0;
+  double highest = 0.0;
+  double high = 0.0;
+  int count = 0;
 
   // Iterate through the map in reverse order
-  for (auto rit = cdipMap.rbegin(); rit != cdipMap.rend(); ++rit)
-    {
-      //TLOG("Checking for date " << rit->second.getDate());
+  for ( auto rit = ( *cdipMap ).rbegin(); rit != ( *cdipMap ).rend(); ++rit ) {
+    //TLOG("Checking for date " << rit->second.getDate());
 
-        if (count == numberDays - 1)
-        {
-            //LOG("taGetHighest count == numberDays break");
-            break;
-        }
-
-        if (count == 0)
-        {
-            highest = rit->second.getHigh();
-    //TLOG("Setting initial highest value " << highest);
-    count++;
-    continue;
-        }
-  else
-  {
-    high = rit->second.getHigh();
-    //LOG("Checking high value " << to_string(high));
-
-    if (high > highest)
-    {
-      highest = high;
-      //LOG("Found new highest value " << to_string(high));
+    if ( count == numberDays - 1 ) {
+      //LOG("taGetHighest count == numberDays break");
+      break;
     }
-          count++;
+
+    if ( count == 0 ) {
+      highest = rit->second->getHigh();
+      //TLOG("Setting initial highest value " << highest);
+      count++;
+      continue;
+    }
+    else {
+      high = rit->second->getHigh();
+      //LOG("Checking high value " << to_string(high));
+
+      if ( high > highest ) {
+        highest = high;
+        //LOG("Found new highest value " << to_string(high));
+      }
+
+      count++;
+    }
   }
-    }
-    return highest;
-}
 
-
-vector<double> TechnicalAnalysis::taGetStochastic()
-{
-    return outStochasticVec;
-}
-
-void TechnicalAnalysis::clearStochasticVec()
-{
-    outStochasticVec.clear();
+  return highest;
 }
 
 /*Price Position Oscillator
@@ -588,7 +493,7 @@ void TechnicalAnalysis::clearBSIVec()
 *
 *
 */
-double TechnicalAnalysis::getMarketCap ( float LastPrice, int numberShares )
+double TechnicalAnalysis::taGetMarketCap ( float LastPrice, int numberShares )
 {
   //TODO This appears to broken in the EOD download data with the numberShares set as "0" for a large number os stocks.
   // Not sure how to fix this?

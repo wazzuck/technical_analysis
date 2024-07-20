@@ -26,6 +26,12 @@ CalendarDayInstrumentPrice::CalendarDayInstrumentPrice()
   , mEMASlow ( 0.0 )
   , mEMAFast ( 0.0 )
   , mMACD ( 0.0 )
+  , mStochastic( 0.0 )
+
+  , mPercentageChange( 0.0 )
+
+  //, mThreeDayPercentageChange( 0.0 )
+  //, mFiveDayPercentageChange( 0.0 )
 {
 }
 
@@ -160,6 +166,58 @@ double CalendarDayInstrumentPrice::getMACD()
   return mMACD;
 }
 
+void CalendarDayInstrumentPrice::setStochastic ( const double &stochastic )
+{
+  mStochastic = stochastic;
+}
+
+double CalendarDayInstrumentPrice::getStochastic()
+{
+  return mStochastic;
+}
+
+void CalendarDayInstrumentPrice::setPercentageChange ( const double &percentageChange )
+{
+  mPercentageChange = percentageChange;
+}
+
+double CalendarDayInstrumentPrice::getPercentageChange()
+{
+  return mPercentageChange;
+}
+
+/*
+void CalendarDayInstrumentPrice::setOneDayPercentageChange ( const double &oneDayPercentageChange )
+{
+  mOneDayPercentageChange = oneDayPercentageChange;
+}
+
+double CalendarDayInstrumentPrice::getOneDayPercentageChange()
+{
+  return mOneDayPercentageChange;
+}
+
+void CalendarDayInstrumentPrice::setThreeDayPercentageChange ( const double &threeDayPercentageChange )
+{
+  mThreeDayPercentageChange = threeDayPercentageChange;
+}
+
+double CalendarDayInstrumentPrice::getThreeDayPercentageChange()
+{
+  return mThreeDayPercentageChange;
+}
+
+void CalendarDayInstrumentPrice::setFiveDayPercentageChange ( const double &fiveDayPercentageChange )
+{
+  mFiveDayPercentageChange = fiveDayPercentageChange;
+}
+
+double CalendarDayInstrumentPrice::getFiveDayPercentageChange()
+{
+  return mFiveDayPercentageChange;
+}
+*/
+
 void CalendarDayInstrumentPrice::setValues ( const vector<string> &v )
 {
   CalendarDayInstrumentPrice::setMnemonic ( v[0] );
@@ -183,8 +241,16 @@ void CalendarDayInstrumentPrice::printCalendarDayInstrumentPrice()
   DLOG ( "Low :: " << mLow );
   DLOG ( "Close :: " << mClose );
   DLOG ( "Volume :: " << mVolume );
-  DLOG ( "emaFast :: " << mEMAFast );
-  DLOG ( "emaSlow :: " << mEMASlow );
-  DLOG ( "macd :: " << mMACD );
+  DLOG ( "EMAFast :: " << mEMAFast );
+  DLOG ( "EMASlow :: " << mEMASlow );
+  DLOG ( "MACD :: " << mMACD );
+  DLOG ( "Stochastic :: " << mStochastic );
+
+  DLOG ( "Percentage Change :: " << mPercentageChange);
+/*
+  DLOG ( "One Day Percentage Change :: " << mOneDayPercentageChange);
+  DLOG ( "Three Day Percentage Change :: " << mThreeDayPercentageChange);
+  DLOG ( "Five Day Percentage Change :: " << mFiveDayPercentageChange);
+*/
 }
 }

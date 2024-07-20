@@ -14,41 +14,16 @@ class TechnicalAnalysis
 public:
   TechnicalAnalysis();
 
-  vector <double>* taCalculateEMA ( map<string, CalendarDayInstrumentPrice*>* cdipMapPtr, int numberOfDays );
+  vector <double>* taCalculateEMA ( map<string, CalendarDayInstrumentPrice*>* cdipMap, int numberOfDays );
   vector <double>* taCalculateMACD ( map <string, CalendarDayInstrumentPrice*>* cdipMap );
+  vector<double>* taGetStochastic(map <string, CalendarDayInstrumentPrice*>* cdipMap );
+  //vector<double> taGetPPO();
+  //vector<string> taGetBSI();
+  double taGetLowest ( map <string, CalendarDayInstrumentPrice*>* cdipMap, int range );
+  double taGetHighest ( map <string, CalendarDayInstrumentPrice*>* cdipMap, int range );
 
-  //vector<double> taGetEMA();
-  //void clearEMAVec();
-  //vector<double> taGetMACD();
-  //void clearMACDVec();
-
-  //void taSetStochastic(map <string, CalendarDayInstrumentPrice> cdipMap);
-  vector<double> taGetStochastic();
-  void clearStochasticVec();
-
-  //void taSetPPO(map <string, CalendarDayInstrumentPrice> cdipMap);
-  vector<double> taGetPPO();
-  void clearPPOVec();
-
-  //void taSetBSI(map <string, CalendarDayInstrumentPrice> cdipMap, float LastMACD, float NextLastMACD);
-  vector<string> taGetBSI();
-  void clearBSIVec();
-
-  double taGetLowest ( map <string, CalendarDayInstrumentPrice> cdipMap, int range );
-  double taGetHighest ( map <string, CalendarDayInstrumentPrice> cdipMap, int range );
-
-  //void setOneDayPercentageChange(double LastPrice, double ComparisonPrice);
-  //void setThreeDayPercentageChange(double LastPrice, double ComparisonPrice);
-  //void setFiveDayPercentageChange(double LastPrice, double ComparisonPrice);
-  double getPercentageChanges ( double LastPrice, double ComparisonPrice );
-
-  /*
-  double getOneDayPercentageChange();
-  double getThreeDayPercentageChange();
-  double getFiveDayPercentageChange();
-  */
-
-  double getMarketCap ( float LastPrice, int numberShares );
+  double taGetPercentageChanges(map< string, CalendarDayInstrumentPrice* >* cdipMap, int number_of_days);
+  double taGetMarketCap ( float LastPrice, int numberShares );
 
   int fastPeriod;
   int slowPeriod;
@@ -57,13 +32,9 @@ public:
 private:
   vector<double> *outEMAVecPtr;
   vector<double> *outMACDVecPtr;
-  //vector<double> outStochasticVec;
+  vector<double> *outStochasticVec;
   //vector<double> outPPOVec;
   //vector<string> outBSIVec; //TODO replace with enum
-  //double mOneDayPercentageChange;
-  //double mThreeDayPercentageChange;
-  //double mFiveDayPercentageChange;
-  //Used for EMA / SMA calculations
-  bool maxDaysCheck; //TODO Common check to see if there is enough data loaded
+  //bool maxDaysCheck; //TODO Common check to see if there is enough data loaded
 };
 }

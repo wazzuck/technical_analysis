@@ -35,6 +35,15 @@ public:
   void setEMAFast ( const double& d );
   void setEMASlow ( const double& d );
   void setMACD ( const double& d );
+  void setStochastic ( const double& d );
+
+  void setPercentageChange ( const double& d );
+
+  /*
+  void setOneDayPercentageChange ( const double& d );
+  void setThreeDayPercentageChange ( const double& d );
+  void setFiveDayPercentageChange ( const double& d );
+  */
 
   string getMnemonic();
   string getDate();
@@ -46,6 +55,15 @@ public:
   double getEMAFast();
   double getEMASlow();
   double getMACD();
+  double getStochastic();
+
+  double getPercentageChange();
+
+  /*
+  double getOneDayPercentageChange();
+  double getThreeDayPercentageChange();
+  double getFiveDayPercentageChange();
+  */
 
   void setValues ( const vector<string> &v );
   void printCalendarDayInstrumentPrice();
@@ -61,5 +79,14 @@ private:
   double mEMASlow;
   double mEMAFast;
   double mMACD;
+  double mStochastic;
+
+  double mPercentageChange;
+
+  /*
+  double mOneDayPercentageChange;
+  double mThreeDayPercentageChange;
+  double mFiveDayPercentageChange;
+  */
 };
 }
