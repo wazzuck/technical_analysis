@@ -43,11 +43,12 @@ public:
 
 private:
   double mMarketCap;
-
+/*
   double mOneDayPercentageChange;
   double mThreeDayPercentageChange;
-  double mFiveDayPercentageChange;
+  double mFiveDayPercentageChange;*/
 };
+
 }
 
 #endif

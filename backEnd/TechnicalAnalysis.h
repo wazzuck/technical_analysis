@@ -16,9 +16,9 @@ public:
 
   vector <double>* taCalculateEMA ( map<string, CalendarDayInstrumentPrice*>* cdipMap, int numberOfDays );
   vector <double>* taCalculateMACD ( map <string, CalendarDayInstrumentPrice*>* cdipMap );
-  vector<double>* taGetStochastic(map <string, CalendarDayInstrumentPrice*>* cdipMap );
+  vector<double>* taCalculateStochastic(map <string, CalendarDayInstrumentPrice*>* cdipMap );
   //vector<double> taGetPPO();
-  //vector<string> taGetBSI();
+  //vector<string> taG<etBSI();
   double taGetLowest ( map <string, CalendarDayInstrumentPrice*>* cdipMap, int range );
   double taGetHighest ( map <string, CalendarDayInstrumentPrice*>* cdipMap, int range );
 

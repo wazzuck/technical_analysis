@@ -30,14 +30,12 @@ map<string, CalendarDayInstrumentPrice *> *PriceLoader::getPrices ( const string
   if ( fs::exists ( fileNameStem + ".txt" ) ) {
     fileName = fileNameStem + ".txt";
   }
-
   else if ( fs::exists ( fileNameStem + ".csv" ) ) {
     fileName = fileNameStem + ".csv";
     isCsv = true;
   }
   else {
-    LOG ( "Neither " + fileNameStem + fileName + ".txt or " + fileNameStem + fileName + ".csv" << "  exist" );
-    exit ( 1 );
+    WLOG ( "Neither " + fileNameStem + fileName + ".txt or " + fileNameStem + fileName + ".csv" << "  exist. Skipping this day." );
   }
 
   DLOG ( "Loading cdipMap for " << fileName );

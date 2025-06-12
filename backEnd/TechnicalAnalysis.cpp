@@ -37,6 +37,7 @@ double TechnicalAnalysis::taGetPercentageChanges ( map <string, CalendarDayInstr
   return percentage_change;
 }
 
+
 /*
  * TODO I'd prefer to move the check for whether enough days have been loaded from the Main function to inside TA.'
  *
@@ -55,50 +56,71 @@ if (MAX_DAYS_LOADED < fastPeriod)
 //https://www.youtube.com/watch?v=ezcwBDsDviE
 vector <double> *TechnicalAnalysis::taCalculateEMA ( map <string, CalendarDayInstrumentPrice *> *cdipMapPtr, int numberOfDays )
 {
-  //DLOG ( "cdipMapPtr Size " << ( *cdipMapPtr ).size() );
 
   /*
+   * I'll leave this here for now, but it might be more useful to print this out after the calculations are completed'
+   *
+   *
+   *
   for (const auto& cdip : (*cdipMapPtr))
   {
       cdip.second->printCalendarDayInstrumentPrice();
   }
   */
 
+
+  // Create a closePriceArray the size of the cdipMap that is input
   double closePriceArray[ ( *cdipMapPtr ).size()];
 
+  //Copy each close price from the map into the array
   int count = 0;
-
   for ( auto item: ( *cdipMapPtr ) ) {
     closePriceArray[count] = item.second->getClose();
     count++;
   }
 
-  const int closePriceArray_size = sizeof ( closePriceArray ) / sizeof ( double );
+  //Find out how big the closePriceArray is.
+  const int closePriceArraySize = sizeof ( closePriceArray ) / sizeof ( double );
 
-  int res_size = closePriceArray_size - TA_EMA_Lookback ( numberOfDays );
 
-  //DLOG ( "res_size" << res_size );
+  //Find out how big the vector that contains the results should be.
+  int resultsSize = closePriceArraySize - TA_EMA_Lookback ( numberOfDays );
+
+
+
+  /*
+   *
+   *
+   * To be removed
+
+  cout << "numberOfDays " << numberOfDays << endl;
+  cout << "closePriceArraySize " << closePriceArraySize << endl;
+  cout << "resultsSize " << resultsSize << endl;
+
+  exit(0);
+
+  */
 
   // dynamically allocate output arrays
-  double *outEMA = new double[res_size]; // Pointer to an array
+  double *outEMA = new double[resultsSize]; // Pointer to an array
 
   int outBegIdx= 0;
   int outNbElement = 0;
   int outBegIdxEMA= 0;
 
-  TA_RetCode res = TA_EMA ( 0, closePriceArray_size-1,        // data range
+  TA_RetCode res = TA_EMA ( 0, closePriceArraySize -1,        // data range
                             closePriceArray,                  // data pointer
                             numberOfDays,                     // TA Func specific args
                             &outBegIdx, &outNbElement,        // relative index and size of results
                             outEMA );                         // arrays of results
 
   if ( res == TA_SUCCESS ) {
-    /*
+
     for (int i = 0; i < outNbElement; i++)
     {
         printf("Result for day #%d outEMA: %f\n", outBegIdxEMA+i, *(outEMA+i));
     }
-    */
+
   }
   else {
     fprintf ( stderr, "Error TA_EMA: %d", res );
@@ -107,12 +129,28 @@ vector <double> *TechnicalAnalysis::taCalculateEMA ( map <string, CalendarDayIns
 
   outEMAVecPtr = new vector<double> ();
 
-  for ( int i = 0; i < res_size; i++ ) {
+  for ( int i = 0; i < resultsSize; i++ ) {
+
+
+
+    cout << outEMA + i << endl;
+
+
+
     outEMAVecPtr->push_back ( * ( outEMA + i ) );
+
+
   }
+
+
 
   return outEMAVecPtr;
 }
+
+
+
+
+
 
 /*
   vector<double> TechnicalAnalysis::taGetEMA()
@@ -154,12 +192,12 @@ vector<double> *TechnicalAnalysis::taCalculateMACD ( map<string, CalendarDayInst
 
   const int closePriceArray_size = sizeof ( closePriceArray ) / sizeof ( double );
 
-  DLOG ( "taSetMACD closePriceArray_size" << closePriceArray_size );
+  DLOG ( "taSetMACD closePriceArray_size: " << closePriceArray_size );
 
   int res_size = closePriceArray_size - TA_MACD_Lookback ( fastPeriod, slowPeriod, signalPeriod );
   // res_size is 17 - MACD can't be calculated for first 33 values as they're used for its initialization
 
-  DLOG ( "res_size" << res_size );
+  DLOG ( "res_size: " << res_size );
 
   // dynamically allocate output arrays
   double *outMACD = new double[res_size];
@@ -245,33 +283,73 @@ void TechnicalAnalysis::clearMACDVec()
 * L14=Lowest price of the 14 previous trading sessions
 * H14=Highest price of the same 14 previous trading sessions
 *
-* TODO WRITE METHOD TO GET LOWEST PRICE of X days.
-*
 *
 */
 
-vector<double> *TechnicalAnalysis::taGetStochastic ( map <string, CalendarDayInstrumentPrice *> *cdipMap )
-{
-  for ( auto cdip : ( * cdipMap ) )  {
-    //According to CMC here https://www.cmcmarkets.com/en-gb/trading-guides/what-is-a-stochastic-indicator
+vector<double> *TechnicalAnalysis::taCalculateStochastic ( map <string, CalendarDayInstrumentPrice *> *cdipMap ) {
+
+  outStochasticVec = new vector<double>();
+
+  int count = 0;
+
+  for (auto cdip = ( * cdipMap ).rbegin(); cdip != ( * cdipMap ).rend(); ++cdip) {
+
+    // According to CMC here https://www.cmcmarkets.com/en-gb/trading-guides/what-is-a-stochastic-indicator
     // The high / low should be taken from the last 14 days?
     // At the moment there is an issue where the sample is currently coming fromt he same day and if the price does not move then
     // a division by 0 leads to a "nan" float which is then rejected when being put in the sqlite DB
 
-
-    //TODO Slide the 14 day lookback window back 1 each loop iteration.
-
     int numberOfDaysLookBack = 14;
-    double high = taGetHighest ( cdipMap, numberOfDaysLookBack );
-    double low = taGetLowest ( cdipMap, numberOfDaysLookBack );
-    double close = cdip.second->getClose();
 
-    double lowToCloseRange = close - low;
-    double lowToHighRange = high - low;
-    double stochastic = ( lowToCloseRange / lowToHighRange ) * 100;
+    double high;
+    double low;
+    double close;
 
-    ( *outStochasticVec ).push_back ( stochastic );
+    double lowToCloseRange;
+    double lowToHighRange;
+    double stochastic;
+
+    // Start with excluding the last element, then the last two, and so on
+    for (size_t excludeCount = 1; excludeCount < ( * cdipMap ).size(); ++excludeCount) {
+        // Determine the iterator to stop at
+        auto stopIt = ( * cdipMap ).end();
+        for (size_t i = 0; i < excludeCount; ++i) {
+            --stopIt;
+        }
+
+        for (auto cdip = ( * cdipMap ).begin(); cdip != stopIt; ++cdip) {
+            // Create a new raw pointer to a new map containing the reduced elements
+            map<string, CalendarDayInstrumentPrice*>* reducedMap = new map<string, CalendarDayInstrumentPrice*>(cdipMap->begin(), stopIt);
+
+            high = taGetHighest ( reducedMap , numberOfDaysLookBack);
+            low = taGetLowest ( reducedMap, numberOfDaysLookBack);
+
+            close = cdip->second->getClose();
+        }
+
+        lowToCloseRange = close - low;
+        lowToHighRange = high - low;
+        stochastic = ( lowToCloseRange / lowToHighRange ) * 100;
+
+        outStochasticVec->push_back ( stochastic );
+    }
+
+    count += 1;
+    if ( count == slowPeriod ) {
+      break;
+    }
   }
+
+  /*
+  for (int value : ( *outStochasticVec ) ) {
+    ELOG ("Stochastic "<< value);
+  }
+  */
+
+  DLOG("outStochasticVec size " << ( *outStochasticVec ).size());
+
+//  exit(0);
+
   return outStochasticVec;
 }
 
@@ -314,7 +392,6 @@ double TechnicalAnalysis::taGetLowest ( map <string, CalendarDayInstrumentPrice 
       count++;
     }
   }
-
   return lowest;
 }
 
@@ -355,7 +432,6 @@ double TechnicalAnalysis::taGetHighest ( map <string, CalendarDayInstrumentPrice
       count++;
     }
   }
-
   return highest;
 }
 

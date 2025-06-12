@@ -383,6 +383,7 @@ int main ( int argc, char *argv[] )
   map<string, InstrumentPrices *>::iterator instrument_price_iter = ( *instrument_prices_map ).begin();
 
   while ( instrument_price_iter != ( *instrument_prices_map ).end() ) {
+
     map<string, CalendarDayInstrumentPrice *> *cdip_map = instrument_price_iter->second->pa.getCdipMapPointer();
 
     TechnicalAnalysis *ta = new TechnicalAnalysis();
@@ -411,7 +412,15 @@ int main ( int argc, char *argv[] )
     // emaSlowPeriodVecPtr 95
     // emaFastPeriodVecPtr 109
 
-    stochastic_vector = ta->taGetStochastic( instrument_price_iter->second->pa.getCdipMapPointer() );
+
+
+
+
+    //stochastic_vector = ta->taCalculateStochastic( instrument_price_iter->second->pa.getCdipMapPointer() );
+
+
+
+
 
     int count = 0;
     int macd_vec_size = ( *macd_vector ).size();
@@ -421,51 +430,63 @@ int main ( int argc, char *argv[] )
         break;
       }
 
-      //DLOG ( "(*ema_fast_period_vector)[count] " << ( *ema_fast_period_vector ) [count] );
       it->second->setEMAFast ( ( *ema_fast_period_vector ) [count] );
-      //DLOG ( "(*ema_slow_period_vector)[count] " << ( *ema_slow_period_vector ) [count] );
       it->second->setEMASlow ( ( *ema_slow_period_vector ) [count] );
-      //DLOG ( "(*macdVecPtr)[count] " << ( *macd_vector ) [count] );
       it->second->setMACD ( ( *macd_vector ) [count] );
 
-      it->second->setPercentageChange(ta->taGetPercentageChanges(cdip_map, count));
+    // Print the size of the vector
+    std::cout << "The size of the ema_fast_period_vector is: " << ( *ema_fast_period_vector ).size() << std::endl;
+    std::cout << "The size of the ema_slow_period_vector is: " << ( *ema_slow_period_vector ).size() << std::endl;
+    std::cout << "The size of the macd_vector is: " << ( *macd_vector ).size() << std::endl;
+    std::cout << "The size of the stochastic_vector is: " << ( *stochastic_vector ).size() << std::endl;
+
+
+
+    /*
+      for (int value : ( *stochastic_vector ) ) {
+        ELOG ("Stochastic "<< value);
+      }
+
+
+
+      it->second->setStochastic ( ( *stochastic_vector ) [count] );
+
+
 
       it->second->setPercentageChange(ta->taGetPercentageChanges(cdip_map, count));
 
-
-
-
-      //Only apply this to the first value
-
-
-      //Calculate percentage changes for 1,3,5 days
-      /*
-      it->second->setOneDayPercentageChange(ta->getPercentageChanges(cdip_map, 1));
-      it->second->setThreeDayPercentageChange(ta->getPercentageChanges(cdip_map, 3));
-      it->second->setFiveDayPercentageChange(ta->getPercentageChanges(cdip_map, 5));
+      it->second->printCalendarDayInstrumentPrice();
       */
 
       count++;
     }
 
+
+
+
+
+
+
     instrument_price_iter++;
+
+
+    break;
+
+
   }
-
-
 
   LOG ( "Finished calculating technical data" );
 
-  ( *instrument_prices_map ) ["VOD"]->PrintInstrumentPrices();
+  ( *instrument_prices_map ) ["AAF"]->PrintInstrumentPrices();
 
   exit ( 0 );
-
-
-
 
 
   //##############################################################################
   // Sqlite
   //##############################################################################
+
+  cout << "running sqlite " << endl;
 
   //Give the output database filename the date of the latest chronoligocal date loaded
   //Output the database file to the /dev/shm/ ram drive.
